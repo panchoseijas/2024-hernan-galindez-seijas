@@ -21,7 +21,7 @@ Card >> = anotherCard [
 ]
 
 { #category : #operations }
-Card >> applyFrom: aSpaceship target: otherSpaceships blockToApplyLastEffect: lastSquareLandedOn [
+Card >> applyFrom: aSpaceship target: otherSpaceships in: lastSquareLandedOn [
 
 	self subclassResponsibility.
 ]

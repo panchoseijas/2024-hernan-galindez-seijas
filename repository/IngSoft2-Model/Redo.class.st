@@ -28,12 +28,12 @@ Redo class >> recreate [
 ]
 
 { #category : #operations }
-Redo >> applyFrom: aSpaceship target: target blockToApplyLastEffect: blockOfCode [
+Redo >> applyFrom: aSpaceship target: target in: blockOfCode [
 
 	lastUsedCard 
 		applyFrom: aSpaceship
 		target: target
-		blockToApplyLastEffect: blockOfCode
+		in: blockOfCode
 ]
 
 { #category : #initialization }

@@ -5,7 +5,7 @@ Class {
 }
 
 { #category : #operations }
-Cancellation >> applyFrom: aSpaceship target: cardToBeCancelled blockToApplyLastEffect: blockOfCode [
+Cancellation >> applyFrom: aSpaceship target: cardToBeCancelled in: blockOfCode [
 
 	(aSpaceship removeEffect: cardToBeCancelled) 
 ]

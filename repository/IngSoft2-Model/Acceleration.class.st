@@ -8,7 +8,7 @@ Class {
 }
 
 { #category : #operations }
-Acceleration >> applyFrom: aSpaceship target: otherSpaceshipsNames blockToApplyLastEffect: blockOfCode [
+Acceleration >> applyFrom: aSpaceship target: otherSpaceshipsNames in: blockOfCode [
 
 	players do: [ :spaceship |
 		spaceship applyCard: self.

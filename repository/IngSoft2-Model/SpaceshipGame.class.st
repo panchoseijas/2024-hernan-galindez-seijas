@@ -182,11 +182,7 @@ SpaceshipGame >> playCard: card from: spaceshipName target: target [
 	"	cardToBeUsed lastUsedCard: lastUsedCard."
 	cardToBeUsed verifyCanBePlayed: spaceshipToPlay = spaceship.
 
-	cardToBeUsed
-		applyFrom: spaceship
-		target: target
-		blockToApplyLastEffect: [ :otherSpaceship |
-		gameboard applyLastEffectTo: otherSpaceship ].
+	cardToBeUsed applyFrom: spaceship target: target in: gameboard.
 
 	"card canBeReDone ifFalse: [ ^ self ]."
 	"lastUsedCard := cardToBeUsed"

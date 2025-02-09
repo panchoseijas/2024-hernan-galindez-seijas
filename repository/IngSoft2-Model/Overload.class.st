@@ -8,7 +8,7 @@ Class {
 }
 
 { #category : #operations }
-Overload >> applyFrom: aSpaceship target: otherSpaceshipsName blockToApplyLastEffect: lastSquareLandedOn [
+Overload >> applyFrom: aSpaceship target: otherSpaceshipsName in: lastSquareLandedOn [
 
 	affectedSpaceship := players
 		                     detect: [ :player |

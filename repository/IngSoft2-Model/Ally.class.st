@@ -9,7 +9,7 @@ Class {
 }
 
 { #category : #operations }
-Ally >> applyFrom: aSpaceship target: targetName blockToApplyLastEffect: lastSquareLandedOn [
+Ally >> applyFrom: aSpaceship target: targetName in: lastSquareLandedOn [
 
 	| otherSpaceship |
 	otherSpaceship := players
