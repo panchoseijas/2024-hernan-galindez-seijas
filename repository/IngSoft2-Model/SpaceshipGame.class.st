@@ -8,7 +8,8 @@ Class {
 		'numberOfLaps',
 		'rewards',
 		'possibleCards',
-		'redoCardInstance'
+		'redoCardInstance',
+		'turnManager'
 	],
 	#category : #'IngSoft2-Model'
 }
@@ -89,9 +90,11 @@ SpaceshipGame >> initializeWithPlayers: aCollectionOfPlayers withGameboardLength
 
 	Redo deleteInstance.
 
+	turnManager := TurnManager initializeWithPlayers: players.
 	gameboard := Gameboard
 		             numberOfSquares: aLength
 		             spaceships: players
+		             turnManager: turnManager
 		             withParsecs: aNumberOfParsecs
 		             using: dice
 		             generator: squareGenerator
@@ -115,6 +118,8 @@ SpaceshipGame >> initializeWithPlayers: aCollectionOfPlayers withGameboardLength
 		                  cardClass createWith: players ])
 		                 asOrderedCollection.
 
+	turnManager := TurnManager initializeWithPlayers: players.
+
 	players do: [ :player |
 		player
 			giveCard: possibleCards first;
@@ -124,6 +129,7 @@ SpaceshipGame >> initializeWithPlayers: aCollectionOfPlayers withGameboardLength
 	gameboard := Gameboard
 		             numberOfSquares: aLength
 		             spaceships: players
+		             turnManager: turnManager
 		             withParsecs: aNumberOfParsecs
 		             using: dice
 		             generator: squareGenerator
@@ -152,30 +158,13 @@ SpaceshipGame >> lapsCompletedOf: aSpaceshipName [
 	^ gameboard lapsCompletedOf: aSpaceship
 ]
 
-{ #category : #'game logic' }
-SpaceshipGame >> nextPlayer [
-
-	| currentPlayer |
-	currentPlayer := players removeFirst.
-	players addLast: currentPlayer.
-
-
-
-	[ currentPlayer canPlay ] whileFalse: [
-		currentPlayer lostATurn.
-		currentPlayer := players removeFirst.
-		players addLast: currentPlayer ].
-
-	^ currentPlayer
-]
-
 { #category : #'game controls' }
 SpaceshipGame >> playCard: card from: spaceshipName target: target [
 
 	| spaceshipToPlay spaceship cardToBeUsed |
 	self verifyGameIsNotOver.
 
-	spaceshipToPlay := players detect: [ :player | player canPlay ].
+	spaceshipToPlay := turnManager nextPlayer.
 	spaceship := players detect: [ :player | player name = spaceshipName ].
 
 	cardToBeUsed := spaceship useCard: card.
@@ -194,12 +183,11 @@ SpaceshipGame >> playTurn [
 
 	| aNumber spaceshipToPlay |
 	self verifyGameIsNotOver.
-	spaceshipToPlay := self nextPlayer.
+	spaceshipToPlay := turnManager spaceshipToPlay.
 	aNumber := dice throw.
 	aNumber = dice maxThrow ifTrue: [ rewards applyTo: spaceshipToPlay ].
 	spaceshipToPlay playWith: aNumber in: gameboard.
-	gameboard applyEffectTo: spaceshipToPlay.
-	
+	gameboard applyEffectTo: spaceshipToPlay
 ]
 
 { #category : #'game logic' }
@@ -237,7 +225,7 @@ SpaceshipGame >> rankings [
 SpaceshipGame >> skipTurn [
 
 	| currentPlayer |
-	currentPlayer := self nextPlayer.
+	currentPlayer := turnManager spaceshipToPlay.
 	currentPlayer refuel
 ]
 

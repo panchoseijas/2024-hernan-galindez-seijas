@@ -6,7 +6,6 @@ Class {
 		'maxCapacity',
 		'currentFuel',
 		'needsToThrow',
-		'lostTurns',
 		'deck',
 		'ally',
 		'diceAdjustment'
@@ -33,17 +32,9 @@ Spaceship >> applyCard: card [
 ]
 
 { #category : #setting }
-Spaceship >> applyPenaltyIn: gameboard [
-
-	gameboard moveToStart: self.
+Spaceship >> applyPenaltyIn: aGameboard [ 
+	aGameboard spaceshipRanOutOfFuel: self.
 	currentFuel := maxCapacity.
-	lostTurns := 2
-]
-
-{ #category : #testing }
-Spaceship >> canPlay [
-
-	^ lostTurns = 0
 ]
 
 { #category : #setting }
@@ -78,16 +69,9 @@ Spaceship >> initializeWithName: aName withFuel: fuelCapacity [
 	currentFuel := fuelCapacity.
 	maxCapacity := fuelCapacity.
 	needsToThrow := 0.
-	lostTurns := 0.
 	diceAdjustment := 0.
 	ally := NullSpaceship new.
 	deck := Deck with: #(  ) asOrderedCollection
-]
-
-{ #category : #'game logic' }
-Spaceship >> lostATurn [
-	lostTurns := lostTurns - 1.
-
 ]
 
 { #category : #accessing }

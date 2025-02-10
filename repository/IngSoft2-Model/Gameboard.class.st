@@ -9,10 +9,26 @@ Class {
 		'measurement',
 		'measurmentPerSquare',
 		'lastSquareLandedOn',
-		'cards'
+		'cards',
+		'turnManager'
 	],
 	#category : #'IngSoft2-Model'
 }
+
+{ #category : #accessing }
+Gameboard class >> numberOfSquares: aNumberOfSquares spaceships: aSpaceshipCollection turnManager: aTurnManager withParsecs: aNumberOfParsecs using: aDiceCollection generator: squareGenerator cards: cardCollection [
+
+	self verifyGreaterThanZero: aNumberOfSquares.
+
+	^ self new
+		  initializeWithNumberOfSquares: aNumberOfSquares
+		  withSpaceships: aSpaceshipCollection
+		  withTurnManager: aTurnManager
+		  withParsecs: aNumberOfParsecs
+		  withDice: aDiceCollection
+		  withGenerator: squareGenerator
+		  withCards: cardCollection
+]
 
 { #category : #accessing }
 Gameboard class >> numberOfSquares: aNumberOfSquares spaceships: aSpaceshipCollection withParsecs: aNumberOfParsecs using: aDiceCollection generator: squareGenerator cards: cardCollection [
@@ -75,6 +91,25 @@ Gameboard >> initializeWithNumberOfSquares: aNumberOfSquares withSpaceships: spa
 	cards := cardCollection.
 	board := squareGenerator generateSquares: aNumberOfSquares.
 	lastSquareLandedOn := NormalSquare create.
+	self setPlayersAtFirstPosition: spaceships
+]
+
+{ #category : #initialization }
+Gameboard >> initializeWithNumberOfSquares: aNumberOfSquares withSpaceships: spaceshipsCollection withTurnManager: aTurnManager withParsecs: aNumberOfParsecs withDice: aDiceCollection withGenerator: squareGenerator withCards: cardCollection [
+
+	spaceships := spaceshipsCollection.
+	lapCounter := Dictionary
+		              newFromKeys: spaceships
+		              andValues:
+		              (OrderedCollection new: spaceships size withAll: 0).
+
+	measurement := aNumberOfParsecs.
+	measurmentPerSquare := Parsecs of:
+		                       aNumberOfParsecs // aNumberOfSquares.
+	cards := cardCollection.
+	board := squareGenerator generateSquares: aNumberOfSquares.
+	lastSquareLandedOn := NormalSquare create.
+	turnManager := aTurnManager.
 	self setPlayersAtFirstPosition: spaceships
 ]
 
@@ -153,4 +188,11 @@ Gameboard >> setPlayersAtFirstPosition: players [
 Gameboard >> size [
 
 	^ board size
+]
+
+{ #category : #'game logic' }
+Gameboard >> spaceshipRanOutOfFuel: aSpaceship [
+
+	turnManager applyPenalty: 2 to: aSpaceship.
+	self moveToStart: aSpaceship
 ]
