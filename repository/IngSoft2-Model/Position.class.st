@@ -8,6 +8,12 @@ Class {
 	#category : #'IngSoft2-Model'
 }
 
+{ #category : #initialization }
+Position class >> laps: lapsAmount cell: currentCell [
+
+^ (self new ) initializeWithLaps: lapsAmount withCell: currentCell
+]
+
 { #category : #comparing }
 Position >> >= aPosition [
     ^ ( laps > aPosition laps) 
