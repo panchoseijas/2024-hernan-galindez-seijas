@@ -214,7 +214,10 @@ SpaceshipGame >> rankings [
 		playerLap := gameboard lapsCompletedOf: player.
 		playerPositionArray := OrderedCollection
 			                       with: player
-			                       with: playerLap @ playerPosition.
+			                       with:
+			                       (Position
+				                        laps: playerLap
+				                        cell: playerPosition).
 		sortedCollection add: playerPositionArray ].
 
 
