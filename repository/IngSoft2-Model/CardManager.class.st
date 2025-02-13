@@ -4,23 +4,20 @@ Class {
 	#instVars : [
 		'players',
 		'gameboard',
-		'possibleCards',
 		'lastUsedCard',
 		'turnManager',
-		'deck',
 		'activeCards',
 		'cardThrower'
 	],
 	#category : #'IngSoft2-Model'
 }
 
-{ #category : #'as yet unclassified' }
-CardManager class >> players: playersCollection gameboard: aGameboard deck: aDeck turnManager: aTurnManager [
+{ #category : #'instance creation' }
+CardManager class >> players: playersCollection gameboard: aGameboard turnManager: aTurnManager [
 
 	^ self new
 		  initializeWithPlayers: playersCollection
 		  withGameboard: aGameboard
-		  withDeck: aDeck
 		  withTurnManager: aTurnManager
 ]
 
@@ -34,7 +31,6 @@ CardManager >> addActiveCard: aCard [
 CardManager >> applyAccelerationEffect [
 
 	players do: [ :spaceship |
-		spaceship applyCard: self.
 		spaceship changeTotalThrowBy: 1 ]
 ]
 
@@ -75,11 +71,10 @@ CardManager >> createAllianceBetween: aSpaceship and: anotherSpaceshipName [
 ]
 
 { #category : #initialization }
-CardManager >> initializeWithPlayers: playersCollection withGameboard: aGameboard withDeck: aDeck withTurnManager: aTurnManager [
+CardManager >> initializeWithPlayers: playersCollection withGameboard: aGameboard withTurnManager: aTurnManager [
 
 	players := playersCollection.
 	gameboard := aGameboard.
-	deck := aDeck.
 	activeCards := OrderedCollection new.
 	turnManager := aTurnManager.
 	lastUsedCard := NullCard new

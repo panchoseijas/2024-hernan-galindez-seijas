@@ -4,12 +4,6 @@ Class {
 	#category : #'IngSoft2-Model'
 }
 
-{ #category : #operations }
-Card >> applyFrom: aSpaceship target: otherSpaceships in: lastSquareLandedOn [
-
-	self subclassResponsibility.
-]
-
 { #category : #initialization }
 Card >> initialize [
 ]

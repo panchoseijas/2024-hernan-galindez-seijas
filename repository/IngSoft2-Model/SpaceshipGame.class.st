@@ -142,7 +142,6 @@ SpaceshipGame >> initializeWithPlayers: aCollectionOfPlayers withGameboardLength
 	cardManager := CardManager
 		               players: players
 		               gameboard: gameboard
-		               deck: possibleCards
 		               turnManager: turnManager.
 	rewards := aReward
 ]

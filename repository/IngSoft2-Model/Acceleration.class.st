@@ -1,16 +1,8 @@
 Class {
 	#name : #Acceleration,
 	#superclass : #Permanent,
-	#instVars : [
-		'affectedSpaceships'
-	],
 	#category : #'IngSoft2-Model'
 }
-
-{ #category : #initialization }
-Acceleration >> initialize [
-	affectedSpaceships := OrderedCollection new.
-]
 
 { #category : #initialization }
 Acceleration >> removeEffectsWith: aCardManager [
