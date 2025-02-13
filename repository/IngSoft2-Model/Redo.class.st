@@ -28,12 +28,12 @@ Redo class >> recreate [
 ]
 
 { #category : #operations }
-Redo >> applyFrom: aSpaceship target: target blockToApplyLastEffect: blockOfCode [
+Redo >> applyFrom: aSpaceship target: target in: blockOfCode [
 
 	lastUsedCard 
 		applyFrom: aSpaceship
 		target: target
-		blockToApplyLastEffect: blockOfCode
+		in: blockOfCode
 ]
 
 { #category : #initialization }
@@ -50,12 +50,17 @@ Redo >> initialize [
 { #category : #operations }
 Redo >> lastUsedCard: aCard [
 
-	aCard = self ifTrue: [ ^ self ].
-	lastUsedCard := aCard
+	^ aCard
+]
+
+{ #category : #operations }
+Redo >> use: aCardManager from: cardThrower target: aTarget [
+
+	aCardManager redoLastCardFrom: cardThrower target: aTarget
 ]
 
 { #category : #operations }
 Redo >> verifyCanBePlayed: isShipTurn [
 
-	lastUsedCard verifyCanBePlayed: isShipTurn 
+	^ self
 ]

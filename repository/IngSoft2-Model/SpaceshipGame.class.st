@@ -8,7 +8,9 @@ Class {
 		'numberOfLaps',
 		'rewards',
 		'possibleCards',
-		'redoCardInstance'
+		'redoCardInstance',
+		'turnManager',
+		'cardManager'
 	],
 	#category : #'IngSoft2-Model'
 }
@@ -40,6 +42,12 @@ SpaceshipGame class >> withPlayers: somePlayers withGameboardLength: aLength wit
 
 ]
 
+{ #category : #accessing }
+SpaceshipGame >> deckOf: aSpaceshipName [
+
+^ (self shipNamed: aSpaceshipName) cards.
+]
+
 { #category : #initialization }
 SpaceshipGame >> initializeWithPlayers: aCollectionOfPlayers withGameboardLength: aLength withDice: aDiceCollection withLaps: anAmountOfLaps withParsecs: aNumberOfParsecs [
 
@@ -64,13 +72,13 @@ SpaceshipGame >> initializeWithPlayers: aCollectionOfPlayers withGameboardLength
 			           ((DecrementCurrentFuel by: 1) -> 0.2).
 			           ((IncrementFuelCapacity by: 1) -> 0.8) }.
 
-	cardCollection := {
-		                  Cancellation.
-		                  Repeat.
-		                  Acceleration.
-		                  Ally.
-		                  Overload.
-		                  Redo }.
+	possibleCards := {
+		                 Cancellation new.
+		                 Repeat new.
+		                 Acceleration new.
+		                 Ally new.
+		                 Overload new.
+		                 Redo new }.
 
 	redoCardInstance := Redo recreate.
 
@@ -79,9 +87,6 @@ SpaceshipGame >> initializeWithPlayers: aCollectionOfPlayers withGameboardLength
 			           withName: playerName
 			           withFuel: dice maxThrow * 2 ].
 
-	possibleCards := (cardCollection collect: [ :cardClass |
-		                  cardClass createWith: players ])
-		                 asOrderedCollection.
 	players do: [ :player |
 		player
 			giveCard: possibleCards atRandom;
@@ -89,9 +94,11 @@ SpaceshipGame >> initializeWithPlayers: aCollectionOfPlayers withGameboardLength
 
 	Redo deleteInstance.
 
+	turnManager := TurnManager initializeWithPlayers: players.
 	gameboard := Gameboard
 		             numberOfSquares: aLength
 		             spaceships: players
+		             turnManager: turnManager
 		             withParsecs: aNumberOfParsecs
 		             using: dice
 		             generator: squareGenerator
@@ -111,19 +118,20 @@ SpaceshipGame >> initializeWithPlayers: aCollectionOfPlayers withGameboardLength
 			           withName: playerName
 			           withFuel: dice maxThrow * 2 ].
 	redoCardInstance := Redo recreate.
-	possibleCards := (cardCollection collect: [ :cardClass |
-		                  cardClass createWith: players ])
-		                 asOrderedCollection.
+	possibleCards := cardCollection deepCopy.
+
+	turnManager := TurnManager initializeWithPlayers: players.
 
 	players do: [ :player |
 		player
-			giveCard: possibleCards first;
-			giveCard: possibleCards second ].
+			giveCard: possibleCards first deepCopy;
+			giveCard: possibleCards second deepCopy ].
 
 	Redo deleteInstance.
 	gameboard := Gameboard
 		             numberOfSquares: aLength
 		             spaceships: players
+		             turnManager: turnManager
 		             withParsecs: aNumberOfParsecs
 		             using: dice
 		             generator: squareGenerator
@@ -131,6 +139,10 @@ SpaceshipGame >> initializeWithPlayers: aCollectionOfPlayers withGameboardLength
 		             (possibleCards copyFrom: 3 to: possibleCards size).
 	numberOfLaps := anAmountOfLaps.
 
+	cardManager := CardManager
+		               players: players
+		               gameboard: gameboard
+		               turnManager: turnManager.
 	rewards := aReward
 ]
 
@@ -152,45 +164,26 @@ SpaceshipGame >> lapsCompletedOf: aSpaceshipName [
 	^ gameboard lapsCompletedOf: aSpaceship
 ]
 
-{ #category : #'game logic' }
-SpaceshipGame >> nextPlayer [
-
-	| currentPlayer |
-	currentPlayer := players removeFirst.
-	players addLast: currentPlayer.
-
-
-
-	[ currentPlayer canPlay ] whileFalse: [
-		currentPlayer lostATurn.
-		currentPlayer := players removeFirst.
-		players addLast: currentPlayer ].
-
-	^ currentPlayer
-]
-
 { #category : #'game controls' }
 SpaceshipGame >> playCard: card from: spaceshipName target: target [
 
 	| spaceshipToPlay spaceship cardToBeUsed |
 	self verifyGameIsNotOver.
-
-	spaceshipToPlay := players detect: [ :player | player canPlay ].
+	spaceship := self shipNamed: spaceshipName.
+	cardManager playCard: card from: spaceship target: target
+	
+	"	spaceshipToPlay := turnManager nextPlayer.
 	spaceship := players detect: [ :player | player name = spaceshipName ].
 
 	cardToBeUsed := spaceship useCard: card.
-	"	cardToBeUsed lastUsedCard: lastUsedCard."
+	""	cardToBeUsed lastUsedCard: lastUsedCard.""
 	cardToBeUsed verifyCanBePlayed: spaceshipToPlay = spaceship.
 
-	cardToBeUsed
-		applyFrom: spaceship
-		target: target
-		blockToApplyLastEffect: [ :otherSpaceship |
-		gameboard applyLastEffectTo: otherSpaceship ].
+	cardToBeUsed applyFrom: spaceship target: target in: gameboard.
 
-	"card canBeReDone ifFalse: [ ^ self ]."
-	"lastUsedCard := cardToBeUsed"
-	redoCardInstance lastUsedCard: cardToBeUsed
+	""card canBeReDone ifFalse: [ ^ self ].""
+	""lastUsedCard := cardToBeUsed""
+	redoCardInstance lastUsedCard: cardToBeUsed"
 ]
 
 { #category : #'game controls' }
@@ -198,12 +191,11 @@ SpaceshipGame >> playTurn [
 
 	| aNumber spaceshipToPlay |
 	self verifyGameIsNotOver.
-	spaceshipToPlay := self nextPlayer.
+	spaceshipToPlay := turnManager spaceshipToPlay.
 	aNumber := dice throw.
 	aNumber = dice maxThrow ifTrue: [ rewards applyTo: spaceshipToPlay ].
 	spaceshipToPlay playWith: aNumber in: gameboard.
-	gameboard applyEffectTo: spaceshipToPlay.
-	
+	gameboard applyEffectTo: spaceshipToPlay
 ]
 
 { #category : #'game logic' }
@@ -230,18 +222,29 @@ SpaceshipGame >> rankings [
 		playerLap := gameboard lapsCompletedOf: player.
 		playerPositionArray := OrderedCollection
 			                       with: player
-			                       with: playerLap @ playerPosition.
+			                       with:
+			                       (Position
+				                        laps: playerLap
+				                        cell: playerPosition).
 		sortedCollection add: playerPositionArray ].
 
 
 	^ sortedCollection collect: [ :position | position first name ]
 ]
 
+{ #category : #accessing }
+SpaceshipGame >> shipNamed: aName [
+
+	^ players
+		  detect: [ :player | player name = aName ]
+		  ifNone: [ Error signal: 'There are no spaceship named' , aName ]
+]
+
 { #category : #'game logic' }
 SpaceshipGame >> skipTurn [
 
 	| currentPlayer |
-	currentPlayer := self nextPlayer.
+	currentPlayer := turnManager spaceshipToPlay.
 	currentPlayer refuel
 ]
 
