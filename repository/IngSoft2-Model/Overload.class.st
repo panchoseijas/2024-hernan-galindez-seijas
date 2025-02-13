@@ -7,20 +7,6 @@ Class {
 	#category : #'IngSoft2-Model'
 }
 
-{ #category : #operations }
-Overload >> applyFrom: aSpaceship target: otherSpaceshipsName in: lastSquareLandedOn [
-
-	affectedSpaceship := players
-		                     detect: [ :player |
-		                     player name = otherSpaceshipsName ]
-		                     ifNone: [
-		                     Error signal:
-			                     'Overload card target must be a player name' ].
-
-	affectedSpaceship applyCard: self.
-	affectedSpaceship changeTotalThrowBy: 2 negated
-]
-
 { #category : #removing }
 Overload >> initialize [
 
@@ -28,8 +14,17 @@ Overload >> initialize [
 ]
 
 { #category : #removing }
-Overload >> removeEffects [
+Overload >> removeEffectsWith: aCardManager [
 	"affectedSpaceship removeEffect: self"
 
 	affectedSpaceship changeTotalThrowBy: 2
+]
+
+{ #category : #operations }
+Overload >> use: aCardManager from: cardThrower target: aTarget [
+
+	affectedSpaceship := aCardManager shipNamed: aTarget.
+	aCardManager applyOverloadEffectTo: affectedSpaceship.
+
+	aCardManager addActiveCard: self
 ]

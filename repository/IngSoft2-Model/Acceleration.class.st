@@ -7,28 +7,20 @@ Class {
 	#category : #'IngSoft2-Model'
 }
 
-{ #category : #operations }
-Acceleration >> applyFrom: aSpaceship target: otherSpaceshipsNames in: blockOfCode [
-
-	players do: [ :spaceship |
-		spaceship applyCard: self.
-		spaceship changeTotalThrowBy: 1 ]
-]
-
 { #category : #initialization }
 Acceleration >> initialize [
 	affectedSpaceships := OrderedCollection new.
 ]
 
 { #category : #initialization }
-Acceleration >> initializeWith: playersCollection [
+Acceleration >> removeEffectsWith: aCardManager [
 
-	players := playersCollection.
-	affectedSpaceships := OrderedCollection new
+	aCardManager removeAccelerationEffect.
 ]
 
-{ #category : #initialization }
-Acceleration >> removeEffects [
+{ #category : #operations }
+Acceleration >> use: aCardManager from: cardThrower target: aTarget [
 
-	players do: [ :player | player changeTotalThrowBy: 1 negated ]
+	aCardManager applyAccelerationEffect.
+	aCardManager addActiveCard: self
 ]

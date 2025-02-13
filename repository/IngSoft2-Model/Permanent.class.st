@@ -5,7 +5,7 @@ Class {
 }
 
 { #category : #removing }
-Permanent >> removeEffects [
+Permanent >> removeEffectsWith: aCardManager [
 	self subclassResponsibility 
 ]
 

@@ -1,23 +1,13 @@
 Class {
 	#name : #Card,
 	#superclass : #Object,
-	#instVars : [
-		'name',
-		'players'
-	],
 	#category : #'IngSoft2-Model'
 }
-
-{ #category : #operations }
-Card class >> createWith: players [
-
-	^ self new initializeWith: players
-]
 
 { #category : #comparing }
 Card >> = anotherCard [
 
-	^(anotherCard isKindOf: self class)
+	^(anotherCard = self)
 ]
 
 { #category : #operations }
@@ -27,8 +17,19 @@ Card >> applyFrom: aSpaceship target: otherSpaceships in: lastSquareLandedOn [
 ]
 
 { #category : #initialization }
-Card >> initializeWith: playersCollection [
-	players := playersCollection
+Card >> initialize [
+]
+
+{ #category : #operations }
+Card >> lastUsedCard: aCard [
+
+	^ self
+]
+
+{ #category : #operations }
+Card >> use: aCardManager from: cardThrower target: aTarget [
+
+	self subclassResponsibility
 ]
 
 { #category : #operations }

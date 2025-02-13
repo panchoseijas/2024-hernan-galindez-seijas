@@ -8,26 +8,6 @@ Class {
 	#category : #'IngSoft2-Model'
 }
 
-{ #category : #operations }
-Ally >> applyFrom: aSpaceship target: targetName in: lastSquareLandedOn [
-
-	| otherSpaceship |
-	otherSpaceship := players
-		                  detect: [ :player |
-		                  player name = targetName ]
-		                  ifNone: [
-		                  Error signal: 'Ally card target must be a player name' ].
-
-	otherSpaceship applyCard: self.
-	aSpaceship applyCard: self.
-
-	aSpaceship allyWith: otherSpaceship.
-	otherSpaceship allyWith: aSpaceship.
-
-	firstAlly := aSpaceship.
-	secondAlly := otherSpaceship
-]
-
 { #category : #initialization }
 Ally >> initialize [
 	firstAlly := NullSpaceship new.
@@ -35,8 +15,22 @@ Ally >> initialize [
 ]
 
 { #category : #operations }
-Ally >> removeEffects [
+Ally >> removeEffectsWith: aCardManager [
 
 	firstAlly allyWith: NullSpaceship new.
 	secondAlly allyWith: NullSpaceship new.
+]
+
+{ #category : #operations }
+Ally >> use: aCardManager from: cardThrower target: aTarget [
+
+	| otherSpaceship |
+	otherSpaceship := aCardManager shipNamed: aTarget.
+
+	aCardManager createAlliance: otherSpaceship.
+
+	firstAlly := cardThrower.
+	secondAlly := otherSpaceship.
+	
+	aCardManager addActiveCard: self
 ]

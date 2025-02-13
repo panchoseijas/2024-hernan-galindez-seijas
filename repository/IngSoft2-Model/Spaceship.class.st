@@ -8,7 +8,8 @@ Class {
 		'needsToThrow',
 		'deck',
 		'ally',
-		'diceAdjustment'
+		'diceAdjustment',
+		'cards'
 	],
 	#category : #'IngSoft2-Model'
 }
@@ -37,6 +38,12 @@ Spaceship >> applyPenaltyIn: aGameboard [
 	currentFuel := maxCapacity.
 ]
 
+{ #category : #accessing }
+Spaceship >> cards [
+
+	^ cards
+]
+
 { #category : #setting }
 Spaceship >> changeCurrentFuelBy: anAmount [
 
@@ -59,7 +66,8 @@ Spaceship >> changeTotalThrowBy: aNumber [
 { #category : #setting }
 Spaceship >> giveCard: aCard [
 
-	deck addCard: aCard copy
+	deck addCard: aCard copy.
+	cards add: aCard deepCopy.
 ]
 
 { #category : #initialization }
@@ -71,7 +79,8 @@ Spaceship >> initializeWithName: aName withFuel: fuelCapacity [
 	needsToThrow := 0.
 	diceAdjustment := 0.
 	ally := NullSpaceship new.
-	deck := Deck with: #(  ) asOrderedCollection
+	deck := Deck with: #(  ) asOrderedCollection.
+	cards := OrderedCollection new.
 ]
 
 { #category : #accessing }

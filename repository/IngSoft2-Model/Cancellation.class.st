@@ -5,7 +5,7 @@ Class {
 }
 
 { #category : #operations }
-Cancellation >> applyFrom: aSpaceship target: cardToBeCancelled in: blockOfCode [
+Cancellation >> use: aCardManager from: cardThrower target: aTarget [
 
-	(aSpaceship removeEffect: cardToBeCancelled) 
+	aCardManager removeCardEffect: aTarget
 ]
