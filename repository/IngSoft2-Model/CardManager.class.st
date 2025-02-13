@@ -81,7 +81,8 @@ CardManager >> initializeWithPlayers: playersCollection withGameboard: aGameboar
 	gameboard := aGameboard.
 	deck := aDeck.
 	activeCards := OrderedCollection new.
-	turnManager := aTurnManager
+	turnManager := aTurnManager.
+	lastUsedCard := NullCard new
 ]
 
 { #category : #initialization }
@@ -91,7 +92,7 @@ CardManager >> playCard: aCard from: aSpaceship target: aTarget [
 	aCard verifyCanBePlayed: cardThrower = aSpaceship.
 	aSpaceship useCard: aCard.
 	aCard use: self from: cardThrower target: aTarget.
-	lastUsedCard := aCard lastUsedCard: lastUsedCard
+	lastUsedCard := aCard lastUsedCard: lastUsedCard.
 ]
 
 { #category : #initialization }
@@ -111,6 +112,9 @@ CardManager >> removeAccelerationEffect [
 { #category : #initialization }
 CardManager >> removeCardEffect: aCard [
 
+	activeCards
+		remove: aCard
+		ifAbsent: [ Error signal: 'This card is not active' ].
 	aCard removeEffectsWith: self
 ]
 

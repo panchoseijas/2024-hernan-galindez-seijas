@@ -154,6 +154,6 @@ Spaceship >> useAllyFuelIfNecessary: squaresToMove in: gameboard [
 
 { #category : #accessing }
 Spaceship >> useCard: aCard [
-	^ deck removeCard: aCard
+	"^ deck removeCard: aCard"
 	
 ]

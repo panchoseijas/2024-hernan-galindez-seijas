@@ -72,13 +72,13 @@ SpaceshipGame >> initializeWithPlayers: aCollectionOfPlayers withGameboardLength
 			           ((DecrementCurrentFuel by: 1) -> 0.2).
 			           ((IncrementFuelCapacity by: 1) -> 0.8) }.
 
-	cardCollection := {
-		                  Cancellation.
-		                  Repeat.
-		                  Acceleration.
-		                  Ally.
-		                  Overload.
-		                  Redo }.
+	possibleCards := {
+		                 Cancellation new.
+		                 Repeat new.
+		                 Acceleration new.
+		                 Ally new.
+		                 Overload new.
+		                 Redo new }.
 
 	redoCardInstance := Redo recreate.
 
@@ -87,9 +87,6 @@ SpaceshipGame >> initializeWithPlayers: aCollectionOfPlayers withGameboardLength
 			           withName: playerName
 			           withFuel: dice maxThrow * 2 ].
 
-	possibleCards := (cardCollection collect: [ :cardClass |
-		                  cardClass createWith: players ])
-		                 asOrderedCollection.
 	players do: [ :player |
 		player
 			giveCard: possibleCards atRandom;
@@ -241,7 +238,7 @@ SpaceshipGame >> shipNamed: aName [
 
 	^ players
 		  detect: [ :player | player name = aName ]
-		  ifNone: [ Error signal: 'There are no spaceship named' + aName ]
+		  ifNone: [ Error signal: 'There are no spaceship named' , aName ]
 ]
 
 { #category : #'game logic' }

@@ -4,12 +4,6 @@ Class {
 	#category : #'IngSoft2-Model'
 }
 
-{ #category : #comparing }
-Card >> = anotherCard [
-
-	^(anotherCard = self)
-]
-
 { #category : #operations }
 Card >> applyFrom: aSpaceship target: otherSpaceships in: lastSquareLandedOn [
 
