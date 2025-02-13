@@ -9,7 +9,8 @@ Class {
 		'rewards',
 		'possibleCards',
 		'redoCardInstance',
-		'turnManager'
+		'turnManager',
+		'cardManager'
 	],
 	#category : #'IngSoft2-Model'
 }
@@ -41,6 +42,12 @@ SpaceshipGame class >> withPlayers: somePlayers withGameboardLength: aLength wit
 
 ]
 
+{ #category : #accessing }
+SpaceshipGame >> deckOf: aSpaceshipName [
+
+^ (self shipNamed: aSpaceshipName) cards.
+]
+
 { #category : #initialization }
 SpaceshipGame >> initializeWithPlayers: aCollectionOfPlayers withGameboardLength: aLength withDice: aDiceCollection withLaps: anAmountOfLaps withParsecs: aNumberOfParsecs [
 
@@ -65,13 +72,13 @@ SpaceshipGame >> initializeWithPlayers: aCollectionOfPlayers withGameboardLength
 			           ((DecrementCurrentFuel by: 1) -> 0.2).
 			           ((IncrementFuelCapacity by: 1) -> 0.8) }.
 
-	cardCollection := {
-		                  Cancellation.
-		                  Repeat.
-		                  Acceleration.
-		                  Ally.
-		                  Overload.
-		                  Redo }.
+	possibleCards := {
+		                 Cancellation new.
+		                 Repeat new.
+		                 Acceleration new.
+		                 Ally new.
+		                 Overload new.
+		                 Redo new }.
 
 	redoCardInstance := Redo recreate.
 
@@ -80,9 +87,6 @@ SpaceshipGame >> initializeWithPlayers: aCollectionOfPlayers withGameboardLength
 			           withName: playerName
 			           withFuel: dice maxThrow * 2 ].
 
-	possibleCards := (cardCollection collect: [ :cardClass |
-		                  cardClass createWith: players ])
-		                 asOrderedCollection.
 	players do: [ :player |
 		player
 			giveCard: possibleCards atRandom;
@@ -114,16 +118,14 @@ SpaceshipGame >> initializeWithPlayers: aCollectionOfPlayers withGameboardLength
 			           withName: playerName
 			           withFuel: dice maxThrow * 2 ].
 	redoCardInstance := Redo recreate.
-	possibleCards := (cardCollection collect: [ :cardClass |
-		                  cardClass createWith: players ])
-		                 asOrderedCollection.
+	possibleCards := cardCollection deepCopy.
 
 	turnManager := TurnManager initializeWithPlayers: players.
 
 	players do: [ :player |
 		player
-			giveCard: possibleCards first;
-			giveCard: possibleCards second ].
+			giveCard: possibleCards first deepCopy;
+			giveCard: possibleCards second deepCopy ].
 
 	Redo deleteInstance.
 	gameboard := Gameboard
@@ -137,6 +139,10 @@ SpaceshipGame >> initializeWithPlayers: aCollectionOfPlayers withGameboardLength
 		             (possibleCards copyFrom: 3 to: possibleCards size).
 	numberOfLaps := anAmountOfLaps.
 
+	cardManager := CardManager
+		               players: players
+		               gameboard: gameboard
+		               turnManager: turnManager.
 	rewards := aReward
 ]
 
@@ -163,19 +169,21 @@ SpaceshipGame >> playCard: card from: spaceshipName target: target [
 
 	| spaceshipToPlay spaceship cardToBeUsed |
 	self verifyGameIsNotOver.
-
-	spaceshipToPlay := turnManager nextPlayer.
+	spaceship := self shipNamed: spaceshipName.
+	cardManager playCard: card from: spaceship target: target
+	
+	"	spaceshipToPlay := turnManager nextPlayer.
 	spaceship := players detect: [ :player | player name = spaceshipName ].
 
 	cardToBeUsed := spaceship useCard: card.
-	"	cardToBeUsed lastUsedCard: lastUsedCard."
+	""	cardToBeUsed lastUsedCard: lastUsedCard.""
 	cardToBeUsed verifyCanBePlayed: spaceshipToPlay = spaceship.
 
 	cardToBeUsed applyFrom: spaceship target: target in: gameboard.
 
-	"card canBeReDone ifFalse: [ ^ self ]."
-	"lastUsedCard := cardToBeUsed"
-	redoCardInstance lastUsedCard: cardToBeUsed
+	""card canBeReDone ifFalse: [ ^ self ].""
+	""lastUsedCard := cardToBeUsed""
+	redoCardInstance lastUsedCard: cardToBeUsed"
 ]
 
 { #category : #'game controls' }
@@ -222,6 +230,14 @@ SpaceshipGame >> rankings [
 
 
 	^ sortedCollection collect: [ :position | position first name ]
+]
+
+{ #category : #accessing }
+SpaceshipGame >> shipNamed: aName [
+
+	^ players
+		  detect: [ :player | player name = aName ]
+		  ifNone: [ Error signal: 'There are no spaceship named' , aName ]
 ]
 
 { #category : #'game logic' }

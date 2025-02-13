@@ -5,9 +5,9 @@ Class {
 }
 
 { #category : #operations }
-Repeat >> applyFrom: aSpaceship target: otherSpaceships in: gameboard [
+Repeat >> use: aCardManager from: cardThrower target: aTarget [
 
-	| target |
-	target := players detect: [ :player | player name = otherSpaceships ].
-	gameboard applyLastEffectTo: target
+	| spaceship |
+	spaceship := aCardManager shipNamed: aTarget.
+	aCardManager applyLastEffectTo: spaceship
 ]

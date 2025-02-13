@@ -50,12 +50,17 @@ Redo >> initialize [
 { #category : #operations }
 Redo >> lastUsedCard: aCard [
 
-	aCard = self ifTrue: [ ^ self ].
-	lastUsedCard := aCard
+	^ aCard
+]
+
+{ #category : #operations }
+Redo >> use: aCardManager from: cardThrower target: aTarget [
+
+	aCardManager redoLastCardFrom: cardThrower target: aTarget
 ]
 
 { #category : #operations }
 Redo >> verifyCanBePlayed: isShipTurn [
 
-	lastUsedCard verifyCanBePlayed: isShipTurn 
+	^ self
 ]
