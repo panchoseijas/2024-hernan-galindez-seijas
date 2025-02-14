@@ -51,6 +51,12 @@ Gameboard class >> verifyGreaterThanZero: aLength [
 		Error signal: 'Length must be greater than zero' ]
 ]
 
+{ #category : #'game logic' }
+Gameboard >> addLapTo: aSpaceship [
+
+	lapCounter at: aSpaceship update: [ :x | x + 1 ]
+]
+
 { #category : #accessing }
 Gameboard >> applyEffectTo: aSpaceship [
 
@@ -200,4 +206,13 @@ Gameboard >> spaceshipRanOutOfFuel: aSpaceship [
 
 	turnManager applyPenalty: 2 to: aSpaceship.
 	self moveToStart: aSpaceship
+]
+
+{ #category : #'game logic' }
+Gameboard >> substractLapTo: aSpaceship [
+
+	(lapCounter at: aSpaceship) = 0 ifTrue: [
+		self moveToStart: aSpaceship.
+		^ self ].
+	lapCounter at: aSpaceship update: [ :x | x - 1 ]
 ]

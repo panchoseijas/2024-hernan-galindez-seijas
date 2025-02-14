@@ -17,5 +17,7 @@ Reversal >> removeEffectsWith: aCardManager [
 Reversal >> use: aCardManager from: cardThrower target: aTarget [
 
 	aCardManager invertSquare: aTarget.
-	affectedTarget := aTarget
+	affectedTarget := aTarget.
+
+	aCardManager addActiveCard: self
 ]

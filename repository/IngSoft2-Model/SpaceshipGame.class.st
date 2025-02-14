@@ -167,23 +167,12 @@ SpaceshipGame >> lapsCompletedOf: aSpaceshipName [
 { #category : #'game controls' }
 SpaceshipGame >> playCard: card from: spaceshipName target: target [
 
-	| spaceshipToPlay spaceship cardToBeUsed |
+	|  spaceship  |
 	self verifyGameIsNotOver.
 	spaceship := self shipNamed: spaceshipName.
 	cardManager playCard: card from: spaceship target: target
 	
-	"	spaceshipToPlay := turnManager nextPlayer.
-	spaceship := players detect: [ :player | player name = spaceshipName ].
 
-	cardToBeUsed := spaceship useCard: card.
-	""	cardToBeUsed lastUsedCard: lastUsedCard.""
-	cardToBeUsed verifyCanBePlayed: spaceshipToPlay = spaceship.
-
-	cardToBeUsed applyFrom: spaceship target: target in: gameboard.
-
-	""card canBeReDone ifFalse: [ ^ self ].""
-	""lastUsedCard := cardToBeUsed""
-	redoCardInstance lastUsedCard: cardToBeUsed"
 ]
 
 { #category : #'game controls' }

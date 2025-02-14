@@ -38,3 +38,13 @@ HyperJump >> initializeWith: aNumberArray [
 	listOfValues := aNumberArray asOrderedCollection.
 	state := NormalState new
 ]
+
+{ #category : #'add/remove' }
+HyperJump >> squaresToMoveIn: aGameboard [
+
+	| amountToMove  gameboardMeasurment |
+	gameboardMeasurment := aGameboard measurementPerSquare.
+	amountToMove := listOfValues removeFirst.
+	listOfValues addLast: amountToMove.
+	^ amountToMove // gameboardMeasurment
+]
