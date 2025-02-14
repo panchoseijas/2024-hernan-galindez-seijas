@@ -9,7 +9,13 @@ Class {
 }
 
 { #category : #'add/remove' }
-CardSquare >> applyEffectTo: aSpaceship in: aGameboard [
+CardSquare >> applyInvertedEffectTo: aSpaceship in: aGameboard [
+
+	aSpaceship discardRandomCard
+]
+
+{ #category : #'add/remove' }
+CardSquare >> applyNormalEffectTo: aSpaceship in: aGameboard [
 
 	aSpaceship giveCard: (aGameboard possibleCards) atRandom
 ]

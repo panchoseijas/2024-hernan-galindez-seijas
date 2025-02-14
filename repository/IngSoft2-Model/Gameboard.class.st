@@ -51,6 +51,12 @@ Gameboard class >> verifyGreaterThanZero: aLength [
 		Error signal: 'Length must be greater than zero' ]
 ]
 
+{ #category : #'game logic' }
+Gameboard >> addLapTo: aSpaceship [
+
+	lapCounter at: aSpaceship update: [ :x | x + 1 ]
+]
+
 { #category : #accessing }
 Gameboard >> applyEffectTo: aSpaceship [
 
@@ -64,7 +70,7 @@ Gameboard >> applyEffectTo: aSpaceship [
 { #category : #accessing }
 Gameboard >> applyLastEffectTo: aSpaceship [
 
-	lastSquareLandedOn applyEffectTo: aSpaceship in: self
+	lastSquareLandedOn applyNormalEffectTo: aSpaceship in: self
 ]
 
 { #category : #accessing }
@@ -113,6 +119,11 @@ Gameboard >> initializeWithNumberOfSquares: aNumberOfSquares withSpaceships: spa
 	self setPlayersAtFirstPosition: spaceships
 ]
 
+{ #category : #'as yet unclassified' }
+Gameboard >> invertSquareOn: anIndex [ 
+	(board at: anIndex) invert
+]
+
 { #category : #accessing }
 Gameboard >> lapsCompletedOf: aSpaceship [
 
@@ -144,14 +155,14 @@ Gameboard >> move: aSpaceship with: aNumberOfSquares [
 ]
 
 { #category : #setting }
-Gameboard >> moveAllBack: anAmountOfSquares except: aSpaceship [
+Gameboard >> moveAll: anAmountOfSquares except: aSpaceship [
 
 	| playersToMove |
 	playersToMove := spaceships select: [ :spaceship |
 		                 spaceship ~= aSpaceship ].
 
 	playersToMove do: [ :player |
-		player move: anAmountOfSquares negated in: self ]
+		player move: anAmountOfSquares  in: self ]
 ]
 
 { #category : #setting }
@@ -195,4 +206,13 @@ Gameboard >> spaceshipRanOutOfFuel: aSpaceship [
 
 	turnManager applyPenalty: 2 to: aSpaceship.
 	self moveToStart: aSpaceship
+]
+
+{ #category : #'game logic' }
+Gameboard >> substractLapTo: aSpaceship [
+
+	(lapCounter at: aSpaceship) = 0 ifTrue: [
+		self moveToStart: aSpaceship.
+		^ self ].
+	lapCounter at: aSpaceship update: [ :x | x - 1 ]
 ]

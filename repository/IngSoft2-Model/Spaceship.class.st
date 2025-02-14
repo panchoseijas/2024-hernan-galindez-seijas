@@ -56,6 +56,12 @@ Spaceship >> changeTotalThrowBy: aNumber [
 	diceAdjustment := diceAdjustment + aNumber.
 ]
 
+{ #category : #'as yet unclassified' }
+Spaceship >> discardRandomCard [
+
+	cards removeAt: cards size atRandom
+]
+
 { #category : #setting }
 Spaceship >> giveCard: aCard [
 
@@ -140,6 +146,9 @@ Spaceship >> useAllyFuelIfNecessary: squaresToMove in: gameboard [
 
 { #category : #accessing }
 Spaceship >> useCard: aCard [
-	"^ deck removeCard: aCard"
-	
+
+	cards
+		remove: aCard
+		ifAbsent: [
+		Error signal: self name , ' does not have a ' , aCard class name, ' card' ]
 ]

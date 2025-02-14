@@ -295,6 +295,41 @@ SpaceshipGameTest >> testGameWinnerWithMoreThanOnePlayer [
 ]
 
 { #category : #tests }
+SpaceshipGameTest >> testReversalCardDHasNoEffectOnAtomicBombSquare [
+
+	| aSpaceship aDiceCollection aGame anotherSpaceship aSpaceshipCollection specificGenerator reversalCard anotherReversalCard |
+	aSpaceship := 'Pancho'.
+	anotherSpaceship := 'Seijas'.
+	aSpaceshipCollection := OrderedCollection
+		                        with: aSpaceship
+		                        with: anotherSpaceship.
+	aDiceCollection := { (LoadedDie sequence: #( 7 9 3 20 )) }.
+	specificGenerator := SpecificSquareGenerator with:
+		                     { ((AtomicBomb create) -> 10) }.
+	aGame := SpaceshipGame
+		         withPlayers: aSpaceshipCollection
+		         withGameboardLength: 15
+		         withDice: aDiceCollection
+		         withLaps: 1
+		         withParsecs: 100
+		         squareGenerator: specificGenerator
+		         rewards: (IncrementFuelCapacity by: 1)
+		         cards: {
+				         Reversal new.
+				         Cancellation new }.
+
+	reversalCard := (aGame deckOf: aSpaceship) first.
+	anotherReversalCard := (aGame deckOf: anotherSpaceship) first.
+
+	aGame playCard: reversalCard from: aSpaceship target: 10.
+	aGame playTurn.
+	aGame playTurn.
+
+	self assert: (aGame positionOf: aSpaceship) equals:  1.
+	self assert: (aGame positionOf: anotherSpaceship) equals: 1
+]
+
+{ #category : #tests }
 SpaceshipGameTest >> testSpaceshipMovedToStartWhenFuelIsEmpty [
 
 	| aSpaceship aDiceCollection aGame aSpaceshipCollection specificGenerator |
@@ -351,6 +386,80 @@ SpaceshipGameTest >> testWhenAGameIsCreatedCheckThatItIsNotOver [
 ]
 
 { #category : #tests }
+SpaceshipGameTest >> testWhenAHyperJumpSquareIsInvertedThenItMovesPlayersBackwards [
+
+	| aSpaceship aDiceCollection aGame aSpaceshipCollection aSpaceship2 specificGenerator reversalCard |
+	aSpaceship := 'Banana'.
+	aSpaceship2 := 'Dolca'.
+	aSpaceshipCollection := OrderedCollection
+		                        with: aSpaceship
+		                        with: aSpaceship2.
+	aDiceCollection := { (LoadedDie sequence: #( 9 9 )) }.
+	specificGenerator := SpecificSquareGenerator with:
+		                     { ((HyperJump with: {
+				                       (Parsecs of: 4).
+				                       (LightYears of: 33) }) -> 10) }.
+	aGame := SpaceshipGame
+		         withPlayers: aSpaceshipCollection
+		         withGameboardLength: 15
+		         withDice: aDiceCollection
+		         withLaps: 2
+		         withParsecs: 150
+		         squareGenerator: specificGenerator
+		         rewards: (DecrementCurrentFuel by: 1)
+		         cards: {
+				         Reversal new.
+				         Ally new.
+				         Acceleration new }.
+
+	reversalCard := (aGame deckOf: aSpaceship) first.
+
+	aGame playCard: reversalCard from: aSpaceship target:  10.
+	aGame playTurn.
+	aGame playTurn.
+
+	self assert: (aGame positionOf: aSpaceship) equals: 10.
+	self assert: (aGame positionOf: aSpaceship2) equals: 9
+]
+
+{ #category : #tests }
+SpaceshipGameTest >> testWhenAMoonWalkSquareIsRevertedTwiceItGoesBackToNormal [
+
+	| aSpaceship aDiceCollection aGame anotherSpaceship aSpaceshipCollection specificGenerator reversalCard anotherReversalCard |
+	aSpaceship := 'Pancho'.
+	anotherSpaceship := 'Seijas'.
+	aSpaceshipCollection := OrderedCollection
+		                        with: aSpaceship
+		                        with: anotherSpaceship.
+	aDiceCollection := { (LoadedDie sequence: #( 7 9 3 20 )) }.
+	specificGenerator := SpecificSquareGenerator with:
+		                     { ((MoonWalk withSquaresToMove: 3) -> 10) }.
+	aGame := SpaceshipGame
+		         withPlayers: aSpaceshipCollection
+		         withGameboardLength: 15
+		         withDice: aDiceCollection
+		         withLaps: 1
+		         withParsecs: 100
+		         squareGenerator: specificGenerator
+		         rewards: (IncrementFuelCapacity by: 1)
+		         cards: {
+				         Reversal new.
+				         Cancellation new }.
+
+	reversalCard := (aGame deckOf: aSpaceship) first.
+	anotherReversalCard := (aGame deckOf: anotherSpaceship) first.
+
+	aGame playCard: reversalCard from: aSpaceship target: 10.
+	aGame playTurn.
+
+	aGame playCard: anotherReversalCard from: anotherSpaceship target: 10.
+	aGame playTurn.
+
+	self assert: (aGame positionOf: aSpaceship) equals: 5.
+	self assert: (aGame positionOf: anotherSpaceship) equals: 10
+]
+
+{ #category : #tests }
 SpaceshipGameTest >> testWhenAPlayerReachesTheEndTheGameFinishes [
 
 	| aSpaceship aDiceCollection aGame aSpaceshipArray specificGenerator |
@@ -376,6 +485,80 @@ SpaceshipGameTest >> testWhenAPlayerReachesTheEndTheGameFinishes [
 ]
 
 { #category : #tests }
+SpaceshipGameTest >> testWhenAReversalCardIsCancelledThenTheSquareGoesBackToNormal [
+
+	| aSpaceship aDiceCollection aGame anotherSpaceship aSpaceshipCollection specificGenerator reversalCard cancellationCard |
+	aSpaceship := 'Pancho'.
+	anotherSpaceship := 'Seijas'.
+	aSpaceshipCollection := OrderedCollection
+		                        with: aSpaceship
+		                        with: anotherSpaceship.
+	aDiceCollection := { (LoadedDie sequence: #( 7 9 3 20 )) }.
+	specificGenerator := SpecificSquareGenerator with:
+		                     { ((MoonWalk withSquaresToMove: 3) -> 10) }.
+	aGame := SpaceshipGame
+		         withPlayers: aSpaceshipCollection
+		         withGameboardLength: 15
+		         withDice: aDiceCollection
+		         withLaps: 1
+		         withParsecs: 100
+		         squareGenerator: specificGenerator
+		         rewards: (IncrementFuelCapacity by: 1)
+		         cards: {
+				         Reversal new.
+				         Cancellation new }.
+
+	reversalCard := (aGame deckOf: aSpaceship) first.
+	cancellationCard := (aGame deckOf: aSpaceship) second.
+
+	aGame playCard: reversalCard from: aSpaceship target: 10.
+	aGame
+		playCard: cancellationCard
+		from: aSpaceship
+		target: reversalCard.
+	aGame playTurn.
+	aGame playTurn.
+
+	self assert: (aGame positionOf: aSpaceship) equals: 5.
+	self assert: (aGame positionOf: anotherSpaceship) equals: 10
+]
+
+{ #category : #tests }
+SpaceshipGameTest >> testWhenAReversalCardIsPlayedOnAMoonWalkSquareThenThatSquareSendsEveryoneExceptTheLanderForward [
+
+	| aSpaceship aDiceCollection aGame anotherSpaceship aSpaceshipCollection specificGenerator reversalCard |
+	aSpaceship := 'Pancho'.
+	anotherSpaceship := 'Seijas'.
+	aSpaceshipCollection := OrderedCollection
+		                        with: aSpaceship
+		                        with: anotherSpaceship.
+	aDiceCollection := { (LoadedDie sequence: #( 7 9 3 20 )) }.
+	specificGenerator := SpecificSquareGenerator with:
+		                     { ((MoonWalk withSquaresToMove: 3) -> 10) }.
+	aGame := SpaceshipGame
+		         withPlayers: aSpaceshipCollection
+		         withGameboardLength: 15
+		         withDice: aDiceCollection
+		         withLaps: 1
+		         withParsecs: 100
+		         squareGenerator: specificGenerator
+		         rewards: (IncrementFuelCapacity by: 1)
+		         cards: {
+				         Reversal new.
+				         Cancellation new }.
+
+	reversalCard := (aGame deckOf: aSpaceship) first.
+
+
+	aGame playCard: reversalCard from: aSpaceship target: 10.
+	aGame playTurn.
+	aGame playTurn.
+
+	self assert: (aGame positionOf: aSpaceship) equals: 11.
+	self assert: (aGame positionOf: anotherSpaceship) equals: 10
+]
+
+{ #category : #tests }
 SpaceshipGameTest >> testWhenASixIsThrownOnFirstTurnNextPositionIsSeven [
 
 	| aSpaceship aDiceCollection aGame aSpaceshipCollection specificGenerator |
@@ -397,6 +580,84 @@ SpaceshipGameTest >> testWhenASixIsThrownOnFirstTurnNextPositionIsSeven [
 	aGame playTurn.
 
 	self assert: (aGame positionOf: aSpaceship) equals: 7
+]
+
+{ #category : #tests }
+SpaceshipGameTest >> testWhenASquareIsInvertedTwiceTheOneOfTheReversalCardsGetsCancelledThenTheSquareStaysInverted [
+
+	| aSpaceship aDiceCollection aGame anotherSpaceship aSpaceshipCollection specificGenerator reversalCard cancellationCard anotherReversalCard |
+	aSpaceship := 'Pancho'.
+	anotherSpaceship := 'Seijas'.
+	aSpaceshipCollection := OrderedCollection
+		                        with: aSpaceship
+		                        with: anotherSpaceship.
+	aDiceCollection := { (LoadedDie sequence: #( 7 9 3 20 )) }.
+	specificGenerator := SpecificSquareGenerator with:
+		                     { ((MoonWalk withSquaresToMove: 3) -> 10) }.
+	aGame := SpaceshipGame
+		         withPlayers: aSpaceshipCollection
+		         withGameboardLength: 15
+		         withDice: aDiceCollection
+		         withLaps: 1
+		         withParsecs: 100
+		         squareGenerator: specificGenerator
+		         rewards: (IncrementFuelCapacity by: 1)
+		         cards: {
+				         Reversal new.
+				         Cancellation new }.
+
+	reversalCard := (aGame deckOf: aSpaceship) first.
+	anotherReversalCard := (aGame deckOf: anotherSpaceship) first.
+	cancellationCard := (aGame deckOf: aSpaceship) second.
+
+	aGame playCard: reversalCard from: aSpaceship target: 10.
+
+	aGame playTurn.
+	aGame playCard: anotherReversalCard  from: anotherSpaceship target: 10.
+	aGame
+		playCard: cancellationCard
+		from: aSpaceship
+		target: reversalCard.
+	aGame playTurn.
+
+	self assert: (aGame positionOf: aSpaceship) equals: 11.
+	self assert: (aGame positionOf: anotherSpaceship) equals: 10
+]
+
+{ #category : #tests }
+SpaceshipGameTest >> testWhenASquareIsRevertedTwiceThenItGetsBackToNormal [
+
+	| aSpaceship aDiceCollection aGame anotherSpaceship aSpaceshipCollection specificGenerator reversalCard redoCard |
+	aSpaceship := 'Pancho'.
+	anotherSpaceship := 'Seijas'.
+	aSpaceshipCollection := OrderedCollection
+		                        with: aSpaceship
+		                        with: anotherSpaceship.
+	aDiceCollection := { (LoadedDie sequence: #( 7 9 3 20 )) }.
+	specificGenerator := SpecificSquareGenerator with:
+		                     { ((MoonWalk withSquaresToMove: 3) -> 10) }.
+	aGame := SpaceshipGame
+		         withPlayers: aSpaceshipCollection
+		         withGameboardLength: 15
+		         withDice: aDiceCollection
+		         withLaps: 1
+		         withParsecs: 100
+		         squareGenerator: specificGenerator
+		         rewards: (IncrementFuelCapacity by: 1)
+		         cards: {
+				         Reversal new.
+				         Redo new }.
+
+	reversalCard := (aGame deckOf: aSpaceship) first.
+	redoCard := (aGame deckOf: aSpaceship) second.
+
+	aGame playCard: reversalCard from: aSpaceship target: 10.
+	aGame playCard: redoCard from: aSpaceship target: 10.
+	aGame playTurn.
+	aGame playTurn.
+
+	self assert: (aGame positionOf: aSpaceship) equals: 5.
+	self assert: (aGame positionOf: anotherSpaceship) equals: 10
 ]
 
 { #category : #tests }
@@ -604,6 +865,36 @@ SpaceshipGameTest >> testWhenAllyCardIsUsedAndOnePlayerDoesNotHaveFuelRequiredTo
 ]
 
 { #category : #tests }
+SpaceshipGameTest >> testWhenBlackHoleIsInvertedThenItMovesPlayersForward [
+
+	| aSpaceship aDiceCollection aGame aSpaceshipCollection specificGenerator reversal |
+	aSpaceship := 'Zalo4'.
+	aSpaceshipCollection := OrderedCollection with: aSpaceship.
+	aDiceCollection := { (LoadedDie sequence: #( 3 4 8 )) }.
+	specificGenerator := SpecificSquareGenerator with:
+		                     { (BlackHole create -> 8) }.
+	aGame := SpaceshipGame
+		         withPlayers: aSpaceshipCollection
+		         withGameboardLength: 15
+		         withDice: aDiceCollection
+		         withLaps: 1
+		         withParsecs: 100
+		         squareGenerator: specificGenerator
+		         rewards: {  }
+		         cards: {
+				         Reversal new.
+				         Ally new.
+				         Acceleration new }.
+	reversal := (aGame deckOf: aSpaceship) first.
+
+	aGame playCard: reversal from: aSpaceship target: 8.
+	aGame playTurn.
+	aGame playTurn.
+
+	self assert: (aGame positionOf: aSpaceship) equals: 12
+]
+
+{ #category : #tests }
 SpaceshipGameTest >> testWhenCancellationCardIsUsedAndRedoCardIsUsedThenRedoCardCancellsTheTargetCard [
 
 	| aSpaceship aDiceCollection aGame anotherSpaceship aSpaceshipCollection specificGenerator anOverloadCard anotherOverloadCard aCancellationCard aRedoCard |
@@ -631,8 +922,8 @@ SpaceshipGameTest >> testWhenCancellationCardIsUsedAndRedoCardIsUsedThenRedoCard
 
 	anOverloadCard := (aGame deckOf: aSpaceship) first.
 	anotherOverloadCard := (aGame deckOf: anotherSpaceship) first.
-	
-	aCancellationCard := (aGame deckOf: aSpaceship) second.
+
+	aCancellationCard := (aGame deckOf: anotherSpaceship) second.
 
 	aGame
 		playCard: anOverloadCard
@@ -641,7 +932,7 @@ SpaceshipGameTest >> testWhenCancellationCardIsUsedAndRedoCardIsUsedThenRedoCard
 
 	aGame playTurn.
 
-	aRedoCard := (aGame deckOf: aSpaceship) third.
+	aRedoCard := (aGame deckOf: aSpaceship) second.
 
 	aGame
 		playCard: anotherOverloadCard
@@ -657,7 +948,10 @@ SpaceshipGameTest >> testWhenCancellationCardIsUsedAndRedoCardIsUsedThenRedoCard
 	aGame playTurn.
 
 
-	aGame playCard: aRedoCard from: aSpaceship target: anotherOverloadCard .
+	aGame
+		playCard: aRedoCard
+		from: aSpaceship
+		target: anotherOverloadCard.
 	aGame playTurn.
 	aGame playTurn.
 
@@ -750,6 +1044,45 @@ SpaceshipGameTest >> testWhenCancellationCardIsUsedThenItRemovesTheOtherCardEffe
 
 	self assert: (aGame positionOf: aSpaceship) equals: 12.
 	self assert: (aGame positionOf: anotherSpaceship) equals: 9
+]
+
+{ #category : #tests }
+SpaceshipGameTest >> testWhenCardSquareIsInvertedThenItRemovesACardFromPlayer [
+
+	| aSpaceship aDiceCollection aGame anotherSpaceship aSpaceshipCollection specificGenerator reversalCard  overload |
+	aSpaceship := 'Pancho'.
+	anotherSpaceship := 'Seijas'.
+	aSpaceshipCollection := OrderedCollection
+		                        with: aSpaceship
+		                        with: anotherSpaceship.
+	aDiceCollection := { (LoadedDie sequence: #( 9 3 20 )) }.
+	specificGenerator := SpecificSquareGenerator with:
+		                     { (CardSquare create -> 10) }.
+	aGame := SpaceshipGame
+		         withPlayers: aSpaceshipCollection
+		         withGameboardLength: 15
+		         withDice: aDiceCollection
+		         withLaps: 1
+		         withParsecs: 100
+		         squareGenerator: specificGenerator
+		         rewards: (IncrementFuelCapacity by: 1)
+		         cards: {
+				         Reversal new.
+				         Overload new }.
+
+	reversalCard := (aGame deckOf: aSpaceship) first.
+	overload := (aGame deckOf: anotherSpaceship) second.
+
+	aGame playCard: reversalCard from: aSpaceship target: 10.
+	aGame playTurn.
+	aGame playTurn.
+
+
+	self
+		should: [
+		aGame playCard: overload from: aSpaceship target: anotherSpaceship ]
+		raise: Error
+		withMessage: 'Pancho does not have a Overload card'
 ]
 
 { #category : #tests }
@@ -994,7 +1327,7 @@ SpaceshipGameTest >> testWhenPlayerLandsOnAtomicBombThenAllPlayersStartFromIniti
 { #category : #tests }
 SpaceshipGameTest >> testWhenPlayerLandsOnBlackHoleAndRepeatCardIsUsedThenBlackHoleEffectIsAppliedToTheChoosenPlayer [
 
-	| aSpaceship aDiceCollection aGame anotherSpaceship aSpaceshipCollection specificGenerator |
+	| aSpaceship aDiceCollection aGame anotherSpaceship aSpaceshipCollection specificGenerator repeat |
 	aSpaceship := 'Pancho'.
 	anotherSpaceship := 'Seijas'.
 	aSpaceshipCollection := OrderedCollection
@@ -1013,12 +1346,13 @@ SpaceshipGameTest >> testWhenPlayerLandsOnBlackHoleAndRepeatCardIsUsedThenBlackH
 		         squareGenerator: specificGenerator
 		         rewards: (IncrementFuelCapacity by: 1)
 		         cards: {
-				         Repeat.
-				         Overload.
-				         Ally }.
+				         Repeat new.
+				         Overload new.
+				         Ally new }.
+	repeat := (aGame deckOf: anotherSpaceship) first.
 
 	aGame playTurn.
-	aGame playCard: Repeat new from: anotherSpaceship target: aSpaceship.
+	aGame playCard: repeat from: anotherSpaceship target: aSpaceship.
 	aGame playTurn.
 
 	self assert: (aGame positionOf: aSpaceship) equals: 2.
@@ -1043,9 +1377,9 @@ SpaceshipGameTest >> testWhenPlayerLandsOnBlackHoleAndRunsOutOfFuelWhenGoingBack
 		         squareGenerator: specificGenerator
 		         rewards: {  }
 		         cards: {
-				         Overload.
-				         Ally.
-				         Acceleration }.
+				         Overload new.
+				         Ally new.
+				         Acceleration new }.
 
 
 	aGame playTurn.
@@ -1073,9 +1407,9 @@ SpaceshipGameTest >> testWhenPlayerLandsOnBlackHoleThenMovesBackFourSquares [
 		         squareGenerator: specificGenerator
 		         rewards: {  }
 		         cards: {
-				         Overload.
-				         Ally.
-				         Acceleration }.
+				         Reversal new.
+				         Ally new.
+				         Acceleration new }.
 
 	aGame playTurn.
 	aGame playTurn.
@@ -1086,7 +1420,7 @@ SpaceshipGameTest >> testWhenPlayerLandsOnBlackHoleThenMovesBackFourSquares [
 { #category : #tests }
 SpaceshipGameTest >> testWhenPlayerLandsOnCardSquareThenHeCanUseOverloadCard [
 
-	| aSpaceship aDiceCollection aGame anotherSpaceship aSpaceshipCollection specificGenerator |
+	| aSpaceship aDiceCollection aGame anotherSpaceship aSpaceshipCollection specificGenerator overload anotherOverload |
 	aSpaceship := 'Pancho'.
 	anotherSpaceship := 'Seijas'.
 	aSpaceshipCollection := OrderedCollection
@@ -1105,18 +1439,18 @@ SpaceshipGameTest >> testWhenPlayerLandsOnCardSquareThenHeCanUseOverloadCard [
 		         squareGenerator: specificGenerator
 		         rewards: (IncrementFuelCapacity by: 1)
 		         cards: {
-				         Overload.
-				         Acceleration.
-				         Overload }.
+				         Overload new.
+				         Ally new.
+				         Overload new }.
 
-	aGame
-		playCard: Overload new
-		from: aSpaceship
-		target: anotherSpaceship.
+	overload := (aGame deckOf: aSpaceship) first.
+	aGame playCard: overload from: aSpaceship target: anotherSpaceship.
 	aGame playTurn.
 	aGame playTurn.
+
+	anotherOverload := (aGame deckOf: aSpaceship) second.
 	aGame
-		playCard: Overload new
+		playCard: anotherOverload
 		from: aSpaceship
 		target: anotherSpaceship.
 	aGame playTurn.
@@ -1404,7 +1738,7 @@ SpaceshipGameTest >> testWhenPlayerSkipsTurnThenRefuels [
 { #category : #tests }
 SpaceshipGameTest >> testWhenPlayerUsesOverloadCardThenTheOtherSpaceshipReducesItsTotalThrowByTwo [
 
-	| aSpaceship aDiceCollection aGame anotherSpaceship aSpaceshipCollection specificGenerator |
+	| aSpaceship aDiceCollection aGame anotherSpaceship aSpaceshipCollection specificGenerator overload |
 	aSpaceship := 'Pancho'.
 	anotherSpaceship := 'Seijas'.
 	aSpaceshipCollection := OrderedCollection
@@ -1421,10 +1755,15 @@ SpaceshipGameTest >> testWhenPlayerUsesOverloadCardThenTheOtherSpaceshipReducesI
 		         withParsecs: 100
 		         squareGenerator: specificGenerator
 		         rewards: (IncrementFuelCapacity by: 1)
-		         cards: { Overload . Ally . Acceleration }.
+		         cards: {
+				         Overload new.
+				         Ally new.
+				         Acceleration new }.
+
+	overload := (aGame deckOf: aSpaceship) first.
 
 	aGame
-		playCard: Overload new
+		playCard: overload 
 		from: aSpaceship
 		target: anotherSpaceship.
 	aGame playTurn.
@@ -1432,7 +1771,6 @@ SpaceshipGameTest >> testWhenPlayerUsesOverloadCardThenTheOtherSpaceshipReducesI
 
 	self assert: (aGame positionOf: aSpaceship) equals: 10.
 	self assert: (aGame positionOf: anotherSpaceship) equals: 6
-
 ]
 
 { #category : #tests }
@@ -1464,6 +1802,45 @@ SpaceshipGameTest >> testWhenPlayersCompleteALapThenShowNumbersOfLapsCompleted [
 	aGame playTurn.
 
 	self assert: (aGame lapsCompletedOf: aSpaceship2) equals: 1
+]
+
+{ #category : #tests }
+SpaceshipGameTest >> testWhenReversalIsPlayedOnHyperGravityThenPlayersThatLandThereDontHaveExpectedNumber [
+
+	| aSpaceship aDiceCollection aGame anotherSpaceship aSpaceshipCollection specificGenerator reversalCard |
+	aSpaceship := 'Pancho'.
+	anotherSpaceship := 'Seijas'.
+	aSpaceshipCollection := OrderedCollection
+		                        with: aSpaceship
+		                        with: anotherSpaceship.
+	aDiceCollection := { (LoadedDie sequence: #( 2 2 3 2 20 )) }.
+	specificGenerator := SpecificSquareGenerator with:
+		                     { ((HyperGravity withExpectedNumber: 4) -> 3) }.
+	aGame := SpaceshipGame
+		         withPlayers: aSpaceshipCollection
+		         withGameboardLength: 15
+		         withDice: aDiceCollection
+		         withLaps: 1
+		         withParsecs: 100
+		         squareGenerator: specificGenerator
+		         rewards: (IncrementFuelCapacity by: 1)
+		         cards: {
+				         Reversal new.
+				         Cancellation new }.
+
+	reversalCard := (aGame deckOf: anotherSpaceship) first.
+
+
+	aGame playTurn.
+	aGame playCard: reversalCard from: anotherSpaceship target: 3.
+	aGame playTurn.
+
+	aGame playTurn.
+	aGame playTurn.
+
+
+	self assert: (aGame positionOf: aSpaceship) equals: 3.
+	self assert: (aGame positionOf: anotherSpaceship) equals: 5
 ]
 
 { #category : #tests }
@@ -1500,6 +1877,7 @@ SpaceshipGameTest >> testWhenSomePlayersMoveGivesThePositionOfTheSpaceships [
 
 { #category : #tests }
 SpaceshipGameTest >> testWhenSpaceshipLandsOnFirstWormholeThenMoveItToSecondWormhole [
+	"tests"
 
 	| aSpaceship aDiceCollection aGame aSpaceshipCollection specificGenerator |
 	aSpaceship := 'Helado de menta granizada'.
@@ -1507,7 +1885,6 @@ SpaceshipGameTest >> testWhenSpaceshipLandsOnFirstWormholeThenMoveItToSecondWorm
 	aDiceCollection := OrderedCollection with:
 		                   (LoadedDie sequence: #( 3 )).
 	specificGenerator := SpecificSquareGenerator with:
-
 		                     { (NormalSquare create -> 1) }.
 	aGame := SpaceshipGame
 		         withPlayers: aSpaceshipCollection
@@ -1517,7 +1894,10 @@ SpaceshipGameTest >> testWhenSpaceshipLandsOnFirstWormholeThenMoveItToSecondWorm
 		         withParsecs: 100
 		         squareGenerator: specificGenerator
 		         rewards: (IncrementFuelCapacity by: 1)
-		         cards: { Overload . Ally . Acceleration }.
+		         cards: {
+				         Overload new.
+				         Ally new.
+				         Acceleration new }.
 
 
 	aGame playTurn.
@@ -1537,7 +1917,6 @@ SpaceshipGameTest >> testWhenSpaceshipLandsOnSecondWormholeThenMoveItToFirstWorm
 	wormhole := wormholePair first.
 	anotherWormhole := wormholePair second.
 	specificGenerator := SpecificSquareGenerator with: {
-
 			                     (wormhole -> 4).
 			                     (anotherWormhole -> 5) }.
 	aGame := SpaceshipGame
@@ -1548,7 +1927,10 @@ SpaceshipGameTest >> testWhenSpaceshipLandsOnSecondWormholeThenMoveItToFirstWorm
 		         withParsecs: 100
 		         squareGenerator: specificGenerator
 		         rewards: (IncrementFuelCapacity by: 1)
-		         cards: { Overload . Ally . Acceleration }.
+		         cards: {
+				         Overload.
+				         Ally.
+				         Acceleration }.
 
 
 	aGame playTurn.
@@ -1641,7 +2023,7 @@ SpaceshipGameTest >> testWhenTwoDieAreThrownMovePlayerToTheSumOfDice [
 { #category : #tests }
 SpaceshipGameTest >> testWhenTwoRedoCardAreUsedThenItRedoesTheSameCardTwice [
 
-	| aSpaceship aDiceCollection aGame anotherSpaceship aSpaceshipCollection specificGenerator |
+	| aSpaceship aDiceCollection aGame anotherSpaceship aSpaceshipCollection specificGenerator overload redo redo2 |
 	aSpaceship := 'Pancho'.
 	anotherSpaceship := 'Seijas'.
 	aSpaceshipCollection := OrderedCollection
@@ -1660,23 +2042,103 @@ SpaceshipGameTest >> testWhenTwoRedoCardAreUsedThenItRedoesTheSameCardTwice [
 		         squareGenerator: specificGenerator
 		         rewards: (IncrementFuelCapacity by: 1)
 		         cards: {
-				         Overload.
-				         Redo }.
+				         Overload new.
+				         Redo new }.
 
+	overload := (aGame deckOf: aSpaceship) first.
+	redo := (aGame deckOf: aSpaceship) second.
+	redo2 := (aGame deckOf: anotherSpaceship) second.
 
 	aGame playTurn.
 	aGame playTurn.
 
-	aGame
-		playCard: Overload new
-		from: aSpaceship
-		target: anotherSpaceship.
-	aGame playCard: Redo new from: aSpaceship target: anotherSpaceship.
+	aGame playCard: overload from: aSpaceship target: anotherSpaceship.
+
+	aGame playCard: redo from: aSpaceship target: anotherSpaceship.
 	aGame playTurn.
-	aGame playCard: Redo new from: anotherSpaceship target: aSpaceship.
+	aGame playCard: redo2 from: anotherSpaceship target: aSpaceship.
 	aGame playTurn.
 	aGame playTurn.
 
 	self assert: (aGame positionOf: aSpaceship) equals: 12.
 	self assert: (aGame positionOf: anotherSpaceship) equals: 9
+]
+
+{ #category : #tests }
+SpaceshipGameTest >> testWhenWormholeIsInvertedAndPlayerLandsInFirstWormholeAndPlayerIsInTheFirstLapThenItSendsThemBackToTheStart [
+
+	| aSpaceship aDiceCollection aGame aSpaceshipCollection specificGenerator wormholePair wormhole anotherWormhole reversal |
+	aSpaceship := 'Helado de menta granizada'.
+	aSpaceshipCollection := OrderedCollection with: aSpaceship.
+	aDiceCollection := OrderedCollection with:
+		                   (LoadedDie sequence: #( 3 15 20 )).
+	wormholePair := Wormhole newPair.
+	wormhole := wormholePair first.
+	anotherWormhole := wormholePair second.
+	specificGenerator := SpecificSquareGenerator with: {
+			                     (wormhole -> 4).
+			                     (anotherWormhole -> 5) }.
+	aGame := SpaceshipGame
+		         withPlayers: aSpaceshipCollection
+		         withGameboardLength: 15
+		         withDice: aDiceCollection
+		         withLaps: 1
+		         withParsecs: 100
+		         squareGenerator: specificGenerator
+		         rewards: (IncrementFuelCapacity by: 1)
+		         cards: {
+				         Reversal new.
+				         Ally new.
+				         Acceleration new }.
+
+	reversal := (aGame deckOf: aSpaceship) first.
+
+	aGame playCard: reversal from: aSpaceship target: 4.
+	aGame playTurn.
+
+	self assert: (aGame positionOf: aSpaceship) equals: 1.
+
+	aGame playTurn.
+
+	self assert: aGame isOver
+]
+
+{ #category : #tests }
+SpaceshipGameTest >> testWhenWormholeIsInvertedAndPlayerLandsInSecondWormholeThenItMovesThemToTheFirstWormholeInTheNextLap [
+
+	| aSpaceship aDiceCollection aGame aSpaceshipCollection specificGenerator wormholePair wormhole anotherWormhole reversal |
+	aSpaceship := 'Helado de menta granizada'.
+	aSpaceshipCollection := OrderedCollection with: aSpaceship.
+	aDiceCollection := OrderedCollection with:
+		                   (LoadedDie sequence: #( 4 12 15 50 )).
+	wormholePair := Wormhole newPair.
+	wormhole := wormholePair first.
+	anotherWormhole := wormholePair second.
+	specificGenerator := SpecificSquareGenerator with: {
+			                     (wormhole -> 4).
+			                     (anotherWormhole -> 5) }.
+	aGame := SpaceshipGame
+		         withPlayers: aSpaceshipCollection
+		         withGameboardLength: 15
+		         withDice: aDiceCollection
+		         withLaps: 2
+		         withParsecs: 100
+		         squareGenerator: specificGenerator
+		         rewards: (IncrementFuelCapacity by: 1)
+		         cards: {
+				         Reversal new.
+				         Ally new.
+				         Acceleration new }.
+
+	reversal := (aGame deckOf: aSpaceship) first.
+
+	aGame playCard: reversal from: aSpaceship target: 3.
+	aGame playTurn.
+
+	self assert: (aGame positionOf: aSpaceship) equals: 4.
+
+	aGame playTurn.
+	aGame playTurn.
+
+	self assert: aGame isOver
 ]

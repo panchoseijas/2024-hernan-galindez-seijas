@@ -3,7 +3,8 @@ Class {
 	#superclass : #Object,
 	#instVars : [
 		'occupiedBy',
-		'gameboard'
+		'gameboard',
+		'state'
 	],
 	#category : #'IngSoft2-Model'
 }
@@ -14,8 +15,20 @@ Square class >> create [
 	^ self new initialize
 ]
 
-{ #category : #'add/remove' }
+{ #category : #'as yet unclassified' }
 Square >> applyEffectTo: aSpaceship in: aGameboard [
+
+	state applyEffectfrom: self to: aSpaceship in: aGameboard
+]
+
+{ #category : #'add/remove' }
+Square >> applyInvertedEffectTo: aSpaceship in: aGameboard [
+
+	self subclassResponsibility.
+]
+
+{ #category : #'add/remove' }
+Square >> applyNormalEffectTo: aSpaceship in: aGameboard [
 
 	self subclassResponsibility 
 ]
@@ -29,7 +42,14 @@ Square >> includes: aSpaceship [
 { #category : #initialization }
 Square >> initialize [
 
-	occupiedBy := OrderedCollection new
+	occupiedBy := OrderedCollection new.
+	state := NormalState new.
+]
+
+{ #category : #'add/remove' }
+Square >> invert [
+
+	state := state invert
 ]
 
 { #category : #'add/remove' }
