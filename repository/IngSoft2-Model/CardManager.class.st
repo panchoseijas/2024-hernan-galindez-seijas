@@ -80,6 +80,11 @@ CardManager >> initializeWithPlayers: playersCollection withGameboard: aGameboar
 	lastUsedCard := NullCard new
 ]
 
+{ #category : #'as yet unclassified' }
+CardManager >> invertSquare: anIndex [ 
+	gameboard invertSquareOn: anIndex.
+]
+
 { #category : #initialization }
 CardManager >> playCard: aCard from: aSpaceship target: aTarget [
 

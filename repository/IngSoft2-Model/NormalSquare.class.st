@@ -5,7 +5,13 @@ Class {
 }
 
 { #category : #'add/remove' }
-NormalSquare >> applyEffectTo: aSpaceship in: aGameboard [
+NormalSquare >> applyInvertedEffectTo: aSpaceship in: aGameboard [
+
+	^ self
+]
+
+{ #category : #'add/remove' }
+NormalSquare >> applyNormalEffectTo: aSpaceship in: aGameboard [
 
 	^ self
 ]

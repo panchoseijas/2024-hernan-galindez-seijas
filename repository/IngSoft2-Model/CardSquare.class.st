@@ -9,7 +9,7 @@ Class {
 }
 
 { #category : #'add/remove' }
-CardSquare >> applyEffectTo: aSpaceship in: aGameboard [
+CardSquare >> applyNormalEffectTo: aSpaceship in: aGameboard [
 
 	aSpaceship giveCard: (aGameboard possibleCards) atRandom
 ]

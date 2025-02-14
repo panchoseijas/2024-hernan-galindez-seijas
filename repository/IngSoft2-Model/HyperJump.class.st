@@ -14,28 +14,27 @@ HyperJump class >> with: aUnitsArray [
 ]
 
 { #category : #'add/remove' }
-HyperJump >> applyEffectTo: aSpaceship in: aGameboard [
+HyperJump >> applyInvertedEffectTo: aSpaceship in: aGameboard [
 
-	| amountToMove squaresToMove gameboardMeasurment |
-	gameboardMeasurment := aGameboard measurementPerSquare.
-	amountToMove := listOfValues removeFirst.
-	listOfValues addLast: amountToMove.
-	squaresToMove := amountToMove // gameboardMeasurment.
+	| squaresToMove |
+	squaresToMove := self squaresToMoveIn: aGameboard.
 	squaresToMove = 0 ifTrue: [ ^ self ].
-	aSpaceship move: squaresToMove in: aGameboard
+	aSpaceship move: squaresToMove negated in: aGameboard
 ]
 
 { #category : #'add/remove' }
-HyperJump >> initialize [
+HyperJump >> applyNormalEffectTo: aSpaceship in: aGameboard [
 
-	occupiedBy := OrderedCollection new.
-	listOfValues := #( 4 11 10 ) asOrderedCollection
+	| squaresToMove |
+	squaresToMove := self squaresToMoveIn: aGameboard.
+	squaresToMove = 0 ifTrue: [ ^ self ].
+	aSpaceship move: squaresToMove in: aGameboard
 ]
 
 { #category : #'add/remove' }
 HyperJump >> initializeWith: aNumberArray [
 
 	occupiedBy := OrderedCollection new.
-	listOfValues := aNumberArray asOrderedCollection
-
+	listOfValues := aNumberArray asOrderedCollection.
+	state := NormalState new
 ]

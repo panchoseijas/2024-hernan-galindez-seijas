@@ -5,7 +5,13 @@ Class {
 }
 
 { #category : #'add/remove' }
-AtomicBomb >> applyEffectTo: aSpaceship in: aGameboard [
+AtomicBomb >> applyInvertedEffectTo: aSpaceship in: aGameboard [
+
+	self applyNormalEffectTo: aSpaceship in: aGameboard
+]
+
+{ #category : #'add/remove' }
+AtomicBomb >> applyNormalEffectTo: aSpaceship in: aGameboard [
 
 	aGameboard moveAllToStart 
 ]

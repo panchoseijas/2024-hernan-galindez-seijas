@@ -15,9 +15,15 @@ MoonWalk class >> withSquaresToMove: anAmountOfSquares [
 ]
 
 { #category : #'add/remove' }
-MoonWalk >> applyEffectTo: aSpaceship in: aGameboard [
+MoonWalk >> applyInvertedEffectTo: aSpaceship in: aGameboard [
 
-	aGameboard moveAllBack: squaresToMove except: aSpaceship
+	aGameboard moveAll: squaresToMove except: aSpaceship
+]
+
+{ #category : #'add/remove' }
+MoonWalk >> applyNormalEffectTo: aSpaceship in: aGameboard [
+
+	aGameboard moveAll: squaresToMove negated except: aSpaceship
 ]
 
 { #category : #initialization }

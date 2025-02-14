@@ -64,7 +64,7 @@ Gameboard >> applyEffectTo: aSpaceship [
 { #category : #accessing }
 Gameboard >> applyLastEffectTo: aSpaceship [
 
-	lastSquareLandedOn applyEffectTo: aSpaceship in: self
+	lastSquareLandedOn applyNormalEffectTo: aSpaceship in: self
 ]
 
 { #category : #accessing }
@@ -113,6 +113,11 @@ Gameboard >> initializeWithNumberOfSquares: aNumberOfSquares withSpaceships: spa
 	self setPlayersAtFirstPosition: spaceships
 ]
 
+{ #category : #'as yet unclassified' }
+Gameboard >> invertSquareOn: anIndex [ 
+	(board at: anIndex) invert
+]
+
 { #category : #accessing }
 Gameboard >> lapsCompletedOf: aSpaceship [
 
@@ -144,14 +149,14 @@ Gameboard >> move: aSpaceship with: aNumberOfSquares [
 ]
 
 { #category : #setting }
-Gameboard >> moveAllBack: anAmountOfSquares except: aSpaceship [
+Gameboard >> moveAll: anAmountOfSquares except: aSpaceship [
 
 	| playersToMove |
 	playersToMove := spaceships select: [ :spaceship |
 		                 spaceship ~= aSpaceship ].
 
 	playersToMove do: [ :player |
-		player move: anAmountOfSquares negated in: self ]
+		player move: anAmountOfSquares  in: self ]
 ]
 
 { #category : #setting }
