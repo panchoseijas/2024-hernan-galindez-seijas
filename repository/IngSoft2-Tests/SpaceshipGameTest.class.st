@@ -57,6 +57,42 @@ SpaceshipGameTest >> testCancellationCardCanBeUsedAtAnyMomentOfTheGame [
 ]
 
 { #category : #tests }
+SpaceshipGameTest >> testErrorWhenAPlayerThrowsTimeMachineCardBeforeTwoTurnsHavePassed [
+
+	| aSpaceship aDiceCollection aGame aSpaceshipCollection specificGenerator timeMachineCard |
+	aSpaceship := 'Pancho'.
+
+	aSpaceshipCollection := OrderedCollection with: aSpaceship.
+
+	aDiceCollection := { (LoadedDie sequence: #( 10 8 9 10 1 10 )) }.
+	specificGenerator := SpecificSquareGenerator with:
+		                     { (NormalSquare create -> 1) }.
+	aGame := SpaceshipGame
+		         withPlayers: aSpaceshipCollection
+		         withGameboardLength: 100
+		         withDice: aDiceCollection
+		         withLaps: 1
+		         withParsecs: 100
+		         squareGenerator: specificGenerator
+		         rewards: (IncrementFuelCapacity by: 1)
+		         cards: {
+				         TimeMachine new.
+				         Ally new.
+				         Acceleration new }.
+
+	timeMachineCard := (aGame deckOf: aSpaceship) first.
+
+	aGame playTurn.
+
+	self
+		should: [
+		aGame playCard: timeMachineCard from: aSpaceship target: aSpaceship ]
+		raise: Error
+		withMessage:
+		'The Time Machine Card can only be thrown after two turns'
+]
+
+{ #category : #tests }
 SpaceshipGameTest >> testErrorWhenAPlayerUsesCancellationCardAndNoOtherCardsWhereUsed [
 
 	| aSpaceship aDiceCollection aGame anotherSpaceship aSpaceshipCollection specificGenerator overloadCard cancellationCard |
@@ -1733,6 +1769,49 @@ SpaceshipGameTest >> testWhenPlayerSkipsTurnThenRefuels [
 
 
 	self assert: (aGame positionOf: aSpaceship) equals: 4
+]
+
+{ #category : #tests }
+SpaceshipGameTest >> testWhenPlayerThrowsTimeMachineCardThenTheirFuelGoesBackToTheStateItWasTwoTurnsAgo [
+
+	| aSpaceship aDiceCollection aGame aSpaceshipCollection specificGenerator timeMachineCard |
+	aSpaceship := 'Pancho'.
+
+	aSpaceshipCollection := OrderedCollection with: aSpaceship.
+
+	aDiceCollection := { (LoadedDie sequence: #( 10 8 9 10 1 10 )) }.
+	specificGenerator := SpecificSquareGenerator with:
+		                     { (NormalSquare create -> 1) }.
+	aGame := SpaceshipGame
+		         withPlayers: aSpaceshipCollection
+		         withGameboardLength: 100
+		         withDice: aDiceCollection
+		         withLaps: 1
+		         withParsecs: 100
+		         squareGenerator: specificGenerator
+		         rewards: (IncrementFuelCapacity by: 1)
+		         cards: {
+				         TimeMachine new.
+				         Ally new.
+				         Acceleration new }.
+
+	timeMachineCard := (aGame deckOf: aSpaceship) first.
+
+	aGame playTurn.
+	aGame playTurn.
+
+	aGame playCard: timeMachineCard from: aSpaceship target: aSpaceship.
+
+	aGame playTurn.
+	aGame playTurn.
+
+
+
+	self assert: (aGame positionOf: aSpaceship) equals: 38.
+
+	aGame playTurn.
+
+	self assert: (aGame positionOf: aSpaceship) equals: 1
 ]
 
 { #category : #tests }

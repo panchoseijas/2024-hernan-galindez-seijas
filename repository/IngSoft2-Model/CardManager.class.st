@@ -125,3 +125,12 @@ CardManager >> shipNamed: aName [
 	
 
 ]
+
+{ #category : #'as yet unclassified' }
+CardManager >> timeMachineEffectTo: aSpaceshipName [
+
+	| spaceship |
+	spaceship := self shipNamed: aSpaceshipName.
+	
+	spaceship restoreFuel.
+]

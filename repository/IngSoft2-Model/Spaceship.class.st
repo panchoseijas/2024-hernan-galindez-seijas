@@ -8,7 +8,8 @@ Class {
 		'needsToThrow',
 		'ally',
 		'diceAdjustment',
-		'cards'
+		'cards',
+		'fuelHistory'
 	],
 	#category : #'IngSoft2-Model'
 }
@@ -56,6 +57,12 @@ Spaceship >> changeTotalThrowBy: aNumber [
 	diceAdjustment := diceAdjustment + aNumber.
 ]
 
+{ #category : #accessing }
+Spaceship >> currentFuel [
+
+	^ currentFuel
+]
+
 { #category : #'as yet unclassified' }
 Spaceship >> discardRandomCard [
 
@@ -77,7 +84,8 @@ Spaceship >> initializeWithName: aName withFuel: fuelCapacity [
 	needsToThrow := 0.
 	diceAdjustment := 0.
 	ally := NullSpaceship new.
-	cards := OrderedCollection new
+	cards := OrderedCollection new.
+	fuelHistory := OrderedCollection new.
 ]
 
 { #category : #accessing }
@@ -96,8 +104,9 @@ Spaceship >> move: anAmountOfSquares in: aGameboard [
 ]
 
 { #category : #accessing }
-Spaceship >> name [ 
-	^name
+Spaceship >> name [
+
+	^ name
 ]
 
 { #category : #initialization }
@@ -109,15 +118,35 @@ Spaceship >> needsToThrow: expectedNumber [
 { #category : #accessing }
 Spaceship >> playWith: anAmountOfSquares in: aGameboard [
 
+	self recordFuel.
 	anAmountOfSquares abs < needsToThrow ifTrue: [ ^ self ].
 	needsToThrow := 0.
 	self move: anAmountOfSquares in: aGameboard
+]
+
+{ #category : #initialization }
+Spaceship >> recordFuel [
+
+	fuelHistory add: currentFuel.
+
+	fuelHistory size < 3 ifTrue: [ ^ self ].
+
+	fuelHistory removeFirst
 ]
 
 { #category : #setting }
 Spaceship >> refuel [
 
 	currentFuel := maxCapacity
+]
+
+{ #category : #setting }
+Spaceship >> restoreFuel [
+
+	fuelHistory size < 2 ifTrue: [
+		Error signal:
+			'The Time Machine Card can only be thrown after two turns' ].
+	currentFuel := fuelHistory first
 ]
 
 { #category : #accessing }
