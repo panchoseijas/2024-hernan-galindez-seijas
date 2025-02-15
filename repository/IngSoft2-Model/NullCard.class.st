@@ -5,7 +5,7 @@ Class {
 }
 
 { #category : #operations }
-NullCard >> verifyCanBePlayed: isShipTurn [
+NullCard >> verifyCanBePlayedBy: aSpaceship with: aTurnManager [
 
-	Error signal: 'There is no card to redo' 
+	Error signal: 'There is no card to redo'
 ]

@@ -7,7 +7,7 @@ Class {
 		'lastUsedCard',
 		'turnManager',
 		'activeCards',
-		'cardThrower'
+		'nextPlayer'
 	],
 	#category : #'IngSoft2-Model'
 }
@@ -21,23 +21,17 @@ CardManager class >> players: playersCollection gameboard: aGameboard turnManage
 		  withTurnManager: aTurnManager
 ]
 
-{ #category : #initialization }
+{ #category : #accessing }
 CardManager >> addActiveCard: aCard [
 
 	activeCards add: aCard
 ]
 
-{ #category : #initialization }
+{ #category : #effects }
 CardManager >> applyAccelerationEffect [
 
 	players do: [ :spaceship |
 		spaceship changeTotalThrowBy: 1 ]
-]
-
-{ #category : #initialization }
-CardManager >> applyLastCardEffect [
-	
-	lastUsedCard use: self 
 ]
 
 { #category : #accessing }
@@ -46,21 +40,21 @@ CardManager >> applyLastEffectTo: aSpaceship [
 	gameboard applyLastEffectTo: aSpaceship
 ]
 
-{ #category : #initialization }
+{ #category : #effects }
 CardManager >> applyOverloadEffectTo: affectedSpaceship [
 
 	affectedSpaceship changeTotalThrowBy: -2
 	
 ]
 
-{ #category : #initialization }
+{ #category : #effects }
 CardManager >> createAlliance: aSpaceship [
 
-	cardThrower allyWith: aSpaceship.
-	aSpaceship allyWith: cardThrower
+	nextPlayer allyWith: aSpaceship.
+	aSpaceship allyWith: nextPlayer
 ]
 
-{ #category : #initialization }
+{ #category : #effects }
 CardManager >> createAllianceBetween: aSpaceship and: anotherSpaceshipName [
 
 	| otherSpaceship |
@@ -80,26 +74,26 @@ CardManager >> initializeWithPlayers: playersCollection withGameboard: aGameboar
 	lastUsedCard := NullCard new
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #effects }
 CardManager >> invertSquare: anIndex [ 
 	gameboard invertSquareOn: anIndex.
 ]
 
-{ #category : #initialization }
-CardManager >> playCard: aCard from: aSpaceship target: aTarget [
+{ #category : #accessing }
+CardManager >> playCard: aCard from: cardThrower target: aTarget [
 
-	cardThrower := turnManager nextPlayer.
-	aCard verifyCanBePlayed: cardThrower = aSpaceship.
+	nextPlayer := turnManager nextPlayer.
+	aCard verifyCanBePlayedBy: cardThrower with: turnManager.
 	aCard use: self from: cardThrower target: aTarget.
-	aSpaceship useCard: aCard.
-	lastUsedCard := aCard lastUsedCard: lastUsedCard.
+	cardThrower useCard: aCard.
+	lastUsedCard := aCard lastUsedCard: lastUsedCard
 ]
 
-{ #category : #initialization }
+{ #category : #effects }
 CardManager >> redoLastCardFrom: aSpaceship target: aTarget [
 
-	cardThrower := turnManager nextPlayer.
-	lastUsedCard verifyCanBePlayed: cardThrower = aSpaceship.
+	nextPlayer := turnManager nextPlayer.
+	lastUsedCard verifyCanBePlayedBy: aSpaceship with: turnManager.
 	lastUsedCard use: self from: aSpaceship target: aTarget
 ]
 
@@ -109,7 +103,7 @@ CardManager >> removeAccelerationEffect [
 	players do: [ :player | player changeTotalThrowBy: 1 negated ]
 ]
 
-{ #category : #initialization }
+{ #category : #effects }
 CardManager >> removeCardEffect: aCard [
 
 	activeCards
@@ -118,7 +112,7 @@ CardManager >> removeCardEffect: aCard [
 	aCard removeEffectsWith: self
 ]
 
-{ #category : #initialization }
+{ #category : #accessing }
 CardManager >> shipNamed: aName [
 
 	^ players detect: [ :ship | ship name = aName ] ifNone: [Error signal: 'No ship named ' , aName].
@@ -126,11 +120,12 @@ CardManager >> shipNamed: aName [
 
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #effects }
 CardManager >> timeMachineEffectTo: aSpaceshipName [
 
 	| spaceship |
 	spaceship := self shipNamed: aSpaceshipName.
 	
 	spaceship restoreFuel.
+	spaceship restoreAllyFuel.
 ]

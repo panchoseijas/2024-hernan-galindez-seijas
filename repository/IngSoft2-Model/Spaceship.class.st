@@ -140,12 +140,18 @@ Spaceship >> refuel [
 	currentFuel := maxCapacity
 ]
 
+{ #category : #initialization }
+Spaceship >> restoreAllyFuel [
+
+	ally restoreFuel.
+]
+
 { #category : #setting }
 Spaceship >> restoreFuel [
 
 	fuelHistory size < 2 ifTrue: [
 		Error signal:
-			'The Time Machine Card can only be thrown after two turns' ].
+			name, ' has not played two turns' ].
 	currentFuel := fuelHistory first
 ]
 
