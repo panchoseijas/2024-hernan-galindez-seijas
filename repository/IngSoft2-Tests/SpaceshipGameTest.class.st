@@ -2261,7 +2261,7 @@ SpaceshipGameTest >> testWhenTwoDieAreThrownMovePlayerToTheSumOfDice [
 				         Overload new.
 				         Acceleration new }.
 	reversalCard := (aGame deckOf: aSpaceship) first.
-	aGame playCard: reversalCard from: aSpaceship target: 1.
+	aGame playCard: reversalCard from: aSpaceship target: 7.
 	aGame playTurn.
 
 	self assert: (aGame positionOf: aSpaceship) equals: 10
