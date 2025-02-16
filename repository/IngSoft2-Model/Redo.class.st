@@ -64,3 +64,9 @@ Redo >> verifyCanBePlayed: isShipTurn [
 
 	^ self
 ]
+
+{ #category : #operations }
+Redo >> verifyCanBePlayedBy: aSpaceship with: aTurnManager [
+
+	^ self
+]

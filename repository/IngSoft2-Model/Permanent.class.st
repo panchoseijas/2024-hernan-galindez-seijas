@@ -10,7 +10,8 @@ Permanent >> removeEffectsWith: aCardManager [
 ]
 
 { #category : #operations }
-Permanent >> verifyCanBePlayed: isShipTurn [
+Permanent >> verifyCanBePlayedBy: aSpaceship with: aTurnManager [
 
-	isShipTurn ifFalse: [ Error signal: 'You can only play this card when its your turn' ]
+	aSpaceship = aTurnManager nextPlayer ifFalse: [
+		Error signal: 'You can only play this card when its your turn' ]
 ]

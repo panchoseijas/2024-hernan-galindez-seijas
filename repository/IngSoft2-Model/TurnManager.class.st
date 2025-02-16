@@ -23,13 +23,13 @@ TurnManager >> applyPenalty: aNumber to: aSpoaceship [
 { #category : #'game logic' }
 TurnManager >> initializeWithPlayers: playersCollection [
 
-	playersPenalization := Dictionary
-		                       newFromKeys: playersCollection
-		                       andValues:
-		                       (OrderedCollection
-			                        new: playersCollection size
-			                        withAll: 0).
-	turnOrder := playersCollection copy
+	turnOrder := playersCollection copy.
+
+	playersPenalization := Dictionary new.
+
+
+	playersCollection do: [ :player |
+		playersPenalization at: player put: 0 ]
 ]
 
 { #category : #'game logic' }
@@ -51,6 +51,7 @@ TurnManager >> spaceshipToPlay [
 		playersPenalization at: currentPlayer update: [ :x | x - 1 ].
 		currentPlayer := turnOrder removeFirst.
 		turnOrder addLast: currentPlayer ].
+
 
 	^ currentPlayer
 ]

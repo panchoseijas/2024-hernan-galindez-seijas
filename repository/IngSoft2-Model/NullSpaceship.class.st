@@ -10,6 +10,12 @@ NullSpaceship >> applyPenaltyIn: gameboard [
 	^ self
 ]
 
+{ #category : #setting }
+NullSpaceship >> restoreFuel [
+
+	^ self
+]
+
 { #category : #accessing }
 NullSpaceship >> takeFuel: anAmountOfFuel [
 

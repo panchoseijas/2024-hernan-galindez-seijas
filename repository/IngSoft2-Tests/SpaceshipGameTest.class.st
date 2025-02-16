@@ -57,6 +57,42 @@ SpaceshipGameTest >> testCancellationCardCanBeUsedAtAnyMomentOfTheGame [
 ]
 
 { #category : #tests }
+SpaceshipGameTest >> testErrorWhenAPlayerThrowsTimeMachineCardBeforeTwoTurnsHavePassed [
+
+	| aSpaceship aDiceCollection aGame aSpaceshipCollection specificGenerator timeMachineCard |
+	aSpaceship := 'Pancho'.
+
+	aSpaceshipCollection := OrderedCollection with: aSpaceship.
+
+	aDiceCollection := { (LoadedDie sequence: #( 10 8 9 10 1 10 )) }.
+	specificGenerator := SpecificSquareGenerator with:
+		                     { (NormalSquare create -> 1) }.
+	aGame := SpaceshipGame
+		         withPlayers: aSpaceshipCollection
+		         withGameboardLength: 100
+		         withDice: aDiceCollection
+		         withLaps: 1
+		         withParsecs: 100
+		         squareGenerator: specificGenerator
+		         rewards: (IncrementFuelCapacity by: 1)
+		         cards: {
+				         TimeMachine new.
+				         Ally new.
+				         Acceleration new }.
+
+	timeMachineCard := (aGame deckOf: aSpaceship) first.
+
+	aGame playTurn.
+
+	self
+		should: [
+		aGame playCard: timeMachineCard from: aSpaceship target: aSpaceship ]
+		raise: Error
+		withMessage:
+		'Pancho has not played two turns'
+]
+
+{ #category : #tests }
 SpaceshipGameTest >> testErrorWhenAPlayerUsesCancellationCardAndNoOtherCardsWhereUsed [
 
 	| aSpaceship aDiceCollection aGame anotherSpaceship aSpaceshipCollection specificGenerator overloadCard cancellationCard |
@@ -145,6 +181,49 @@ SpaceshipGameTest >> testErrorWhenGameIsOverAndItIsAttemptedToContinuePlaying [
 		should: [ aGame playTurn ]
 		raise: Error
 		withMessage: 'Game is over'
+]
+
+{ #category : #tests }
+SpaceshipGameTest >> testErrorWhenPlayerThrowsTimeMachineCardAndAllyHasnNotReachedTwoTurns [
+
+	| aSpaceship aDiceCollection aGame aSpaceshipCollection specificGenerator timeMachineCard allyCard anotherSpaceship |
+	aSpaceship := 'Pancho'.
+	anotherSpaceship := 'Seijas'.
+	aSpaceshipCollection := OrderedCollection
+		                        with: aSpaceship
+		                        with: anotherSpaceship.
+
+	aDiceCollection := { (LoadedDie sequence: #( 10 8 9 10 1 10 )) }.
+	specificGenerator := SpecificSquareGenerator with:
+		                     { (NormalSquare create -> 1) }.
+	aGame := SpaceshipGame
+		         withPlayers: aSpaceshipCollection
+		         withGameboardLength: 100
+		         withDice: aDiceCollection
+		         withLaps: 1
+		         withParsecs: 100
+		         squareGenerator: specificGenerator
+		         rewards: (IncrementFuelCapacity by: 1)
+		         cards: {
+				         TimeMachine new.
+				         Ally new.
+				         Acceleration new }.
+
+	timeMachineCard := (aGame deckOf: aSpaceship) first.
+	allyCard := (aGame deckOf: aSpaceship) second.
+
+	aGame playCard: allyCard from: aSpaceship target: anotherSpaceship.
+
+	aGame playTurn.
+	aGame playTurn.
+
+	aGame playTurn.
+
+	self
+		should: [
+		aGame playCard: timeMachineCard from: aSpaceship target: aSpaceship ]
+		raise: Error
+		withMessage: 'Seijas has not played two turns'
 ]
 
 { #category : #tests }
@@ -358,6 +437,65 @@ SpaceshipGameTest >> testSpaceshipMovedToStartWhenFuelIsEmpty [
 	aGame playTurn.
 
 	self assert: (aGame positionOf: aSpaceship) equals: 1
+]
+
+{ #category : #tests }
+SpaceshipGameTest >> testTimeMachineCardCanBeUsedOnOtherPlayer [
+
+	| aSpaceship aDiceCollection aGame aSpaceshipCollection specificGenerator timeMachineCard anotherSpaceship |
+	aSpaceship := 'Pancho'.
+	anotherSpaceship := 'Seijas'.
+
+	aSpaceshipCollection := OrderedCollection
+		                        with: aSpaceship
+		                        with: anotherSpaceship.
+
+	aDiceCollection := { (LoadedDie sequence:
+		                    #( 6 9 2 9 2 2 3 2 3 2 2 10 )) }.
+	specificGenerator := SpecificSquareGenerator with:
+		                     { (NormalSquare create -> 1) }.
+	aGame := SpaceshipGame
+		         withPlayers: aSpaceshipCollection
+		         withGameboardLength: 100
+		         withDice: aDiceCollection
+		         withLaps: 1
+		         withParsecs: 100
+		         squareGenerator: specificGenerator
+		         rewards: (IncrementFuelCapacity by: 1)
+		         cards: {
+				         TimeMachine new.
+				         Ally new.
+				         Acceleration new }.
+
+	timeMachineCard := (aGame deckOf: aSpaceship) first.
+
+	aGame playTurn.
+	aGame playTurn.
+
+	aGame playTurn.
+	aGame playTurn.
+
+	aGame playTurn.
+	aGame playTurn.
+
+	aGame playTurn.
+	aGame playTurn.
+
+	aGame playTurn.
+	aGame playTurn.
+
+
+	aGame
+		playCard: timeMachineCard
+		from: aSpaceship
+		target: anotherSpaceship.
+
+
+	aGame playTurn.
+	aGame playTurn.
+
+
+	self assert: (aGame positionOf: anotherSpaceship) equals: 1
 ]
 
 { #category : #tests }
@@ -1736,6 +1874,49 @@ SpaceshipGameTest >> testWhenPlayerSkipsTurnThenRefuels [
 ]
 
 { #category : #tests }
+SpaceshipGameTest >> testWhenPlayerThrowsTimeMachineCardThenTheirFuelGoesBackToTheStateItWasTwoTurnsAgo [
+
+	| aSpaceship aDiceCollection aGame aSpaceshipCollection specificGenerator timeMachineCard |
+	aSpaceship := 'Pancho'.
+
+	aSpaceshipCollection := OrderedCollection with: aSpaceship.
+
+	aDiceCollection := { (LoadedDie sequence: #( 10 8 9 10 1 10 )) }.
+	specificGenerator := SpecificSquareGenerator with:
+		                     { (NormalSquare create -> 1) }.
+	aGame := SpaceshipGame
+		         withPlayers: aSpaceshipCollection
+		         withGameboardLength: 100
+		         withDice: aDiceCollection
+		         withLaps: 1
+		         withParsecs: 100
+		         squareGenerator: specificGenerator
+		         rewards: (IncrementFuelCapacity by: 1)
+		         cards: {
+				         TimeMachine new.
+				         Ally new.
+				         Acceleration new }.
+
+	timeMachineCard := (aGame deckOf: aSpaceship) first.
+
+	aGame playTurn.
+	aGame playTurn.
+
+	aGame playCard: timeMachineCard from: aSpaceship target: aSpaceship.
+
+	aGame playTurn.
+	aGame playTurn.
+
+
+
+	self assert: (aGame positionOf: aSpaceship) equals: 38.
+
+	aGame playTurn.
+
+	self assert: (aGame positionOf: aSpaceship) equals: 1
+]
+
+{ #category : #tests }
 SpaceshipGameTest >> testWhenPlayerUsesOverloadCardThenTheOtherSpaceshipReducesItsTotalThrowByTwo [
 
 	| aSpaceship aDiceCollection aGame anotherSpaceship aSpaceshipCollection specificGenerator overload |
@@ -1991,6 +2172,69 @@ SpaceshipGameTest >> testWhenSpaceshipThrowsMaxThrowThenItsFuelCapacityItsIncrem
 	aGame playTurn.
 
 	self assert: (aGame positionOf: aSpaceship) equals: 19
+]
+
+{ #category : #tests }
+SpaceshipGameTest >> testWhenTimeMachineCardIsPlayedAndThereIsAnAllienceThenItRestoresBothOfTheSpaceshipsFuel [
+
+	| aSpaceship aDiceCollection aGame aSpaceshipCollection specificGenerator timeMachineCard anotherSpaceship allyCard cancellationCard |
+	aSpaceship := 'Pancho'.
+	anotherSpaceship := 'Seijas'.
+
+	aSpaceshipCollection := OrderedCollection
+		                        with: aSpaceship
+		                        with: anotherSpaceship.
+
+	aDiceCollection := { (LoadedDie sequence:
+		                    #( 6 9 2 9 2 2 3 2 3 2 8 10 )) }.
+	specificGenerator := SpecificSquareGenerator with:
+		                     { (CardSquare create -> 7) }.
+	aGame := SpaceshipGame
+		         withPlayers: aSpaceshipCollection
+		         withGameboardLength: 100
+		         withDice: aDiceCollection
+		         withLaps: 1
+		         withParsecs: 100
+		         squareGenerator: specificGenerator
+		         rewards: (IncrementFuelCapacity by: 1)
+		         cards: {
+				         TimeMachine new.
+				         Ally new.
+				         Cancellation new }.
+
+	timeMachineCard := (aGame deckOf: aSpaceship) first.
+	allyCard := (aGame deckOf: aSpaceship) second.
+	aGame playTurn.
+	aGame playTurn.
+
+	cancellationCard := (aGame deckOf: aSpaceship) third.
+
+	aGame playTurn.
+	aGame playTurn.
+
+	aGame playTurn.
+	aGame playTurn.
+
+	aGame playTurn.
+	aGame playTurn.
+
+	aGame playTurn.
+	aGame playTurn.
+
+	aGame playCard: allyCard from: aSpaceship target: anotherSpaceship.
+
+	aGame
+		playCard: timeMachineCard
+		from: aSpaceship
+		target: anotherSpaceship.
+
+	aGame playCard: cancellationCard from: aSpaceship target: allyCard.
+
+	aGame playTurn.
+	aGame playTurn.
+
+	self assert: (aGame positionOf: aSpaceship) equals: 1.
+	self assert: (aGame positionOf: anotherSpaceship) equals: 1
 ]
 
 { #category : #tests }
