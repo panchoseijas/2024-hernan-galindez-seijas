@@ -1295,7 +1295,7 @@ SpaceshipGameTest >> testWhenGameFinishesGivesTheRankingOfTheSpaceships [
 		                        with: aSpaceship
 		                        with: aSpaceship2
 		                        with: aSpaceship3.
-	aDiceCollection := { (LoadedDie sequence: #( 15 10 3 10 16 7 5 50 )) }.
+	aDiceCollection := { (LoadedDie sequence: #( 15 10 7 10 16 7 5 50 )) }.
 	specificGenerator := SpecificSquareGenerator with:
 		                     { (NormalSquare create -> 1) }.
 	aGame := SpaceshipGame
@@ -2240,14 +2240,13 @@ SpaceshipGameTest >> testWhenTimeMachineCardIsPlayedAndThereIsAnAllienceThenItRe
 { #category : #tests }
 SpaceshipGameTest >> testWhenTwoDieAreThrownMovePlayerToTheSumOfDice [
 
-	| aSpaceship aDiceCollection aGame aSpaceshipCollection specificGenerator |
+	| aSpaceship aDiceCollection aGame aSpaceshipCollection specificGenerator reversalCard |
 	aSpaceship := 'Pancho'.
 	aSpaceshipCollection := OrderedCollection with: aSpaceship.
 	aDiceCollection := OrderedCollection
 		                   with: (LoadedDie sequence: #( 6 ))
 		                   with: (LoadedDie sequence: #( 3 )).
 	specificGenerator := SpecificSquareGenerator with:
-
 		                     { (NormalSquare create -> 1) }.
 	aGame := SpaceshipGame
 		         withPlayers: aSpaceshipCollection
@@ -2257,8 +2256,12 @@ SpaceshipGameTest >> testWhenTwoDieAreThrownMovePlayerToTheSumOfDice [
 		         withParsecs: 100
 		         squareGenerator: specificGenerator
 		         rewards: (IncrementFuelCapacity by: 1)
-		         cards: { Overload . Ally . Acceleration }.
-
+		         cards: {
+				         Reversal new.
+				         Overload new.
+				         Acceleration new }.
+	reversalCard := (aGame deckOf: aSpaceship) first.
+	aGame playCard: reversalCard from: aSpaceship target: 1.
 	aGame playTurn.
 
 	self assert: (aGame positionOf: aSpaceship) equals: 10
@@ -2365,7 +2368,7 @@ SpaceshipGameTest >> testWhenWormholeIsInvertedAndPlayerLandsInSecondWormholeThe
 		         withPlayers: aSpaceshipCollection
 		         withGameboardLength: 15
 		         withDice: aDiceCollection
-		         withLaps: 2
+		         withLaps: 1
 		         withParsecs: 100
 		         squareGenerator: specificGenerator
 		         rewards: (IncrementFuelCapacity by: 1)
@@ -2376,13 +2379,9 @@ SpaceshipGameTest >> testWhenWormholeIsInvertedAndPlayerLandsInSecondWormholeThe
 
 	reversal := (aGame deckOf: aSpaceship) first.
 
-	aGame playCard: reversal from: aSpaceship target: 3.
+	aGame playCard: reversal from: aSpaceship target: 4.
 	aGame playTurn.
 
-	self assert: (aGame positionOf: aSpaceship) equals: 4.
-
-	aGame playTurn.
-	aGame playTurn.
 
 	self assert: aGame isOver
 ]

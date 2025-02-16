@@ -82,25 +82,6 @@ Gameboard >> find: aTarget [
 ]
 
 { #category : #initialization }
-Gameboard >> initializeWithNumberOfSquares: aNumberOfSquares withSpaceships: spaceshipsCollection withParsecs: aNumberOfParsecs withDice: aDiceCollection withGenerator: squareGenerator withCards: cardCollection [
-
-
-	spaceships := spaceshipsCollection.
-	lapCounter := Dictionary
-		              newFromKeys: spaceships
-		              andValues:
-		              (OrderedCollection new: spaceships size withAll: 0).
-
-	measurement := aNumberOfParsecs.
-	measurmentPerSquare := Parsecs of:
-		                       aNumberOfParsecs // aNumberOfSquares.
-	cards := cardCollection.
-	board := squareGenerator generateSquares: aNumberOfSquares.
-	lastSquareLandedOn := NormalSquare create.
-	self setPlayersAtFirstPosition: spaceships
-]
-
-{ #category : #initialization }
 Gameboard >> initializeWithNumberOfSquares: aNumberOfSquares withSpaceships: spaceshipsCollection withTurnManager: aTurnManager withParsecs: aNumberOfParsecs withDice: aDiceCollection withGenerator: squareGenerator withCards: cardCollection [
 
 	spaceships := spaceshipsCollection.
@@ -119,7 +100,7 @@ Gameboard >> initializeWithNumberOfSquares: aNumberOfSquares withSpaceships: spa
 	self setPlayersAtFirstPosition: spaceships
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #'game logic' }
 Gameboard >> invertSquareOn: anIndex [ 
 	(board at: anIndex) invert
 ]
