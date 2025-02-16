@@ -54,16 +54,6 @@ CardManager >> createAlliance: aSpaceship [
 	aSpaceship allyWith: nextPlayer
 ]
 
-{ #category : #effects }
-CardManager >> createAllianceBetween: aSpaceship and: anotherSpaceshipName [
-
-	| otherSpaceship |
-	otherSpaceship := self shipNamed: anotherSpaceshipName.
-	
-	aSpaceship allyWith: otherSpaceship.
-	otherSpaceship allyWith: aSpaceship.
-]
-
 { #category : #initialization }
 CardManager >> initializeWithPlayers: playersCollection withGameboard: aGameboard withTurnManager: aTurnManager [
 
