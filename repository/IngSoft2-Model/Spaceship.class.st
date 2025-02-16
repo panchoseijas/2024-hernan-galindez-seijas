@@ -57,13 +57,7 @@ Spaceship >> changeTotalThrowBy: aNumber [
 	diceAdjustment := diceAdjustment + aNumber.
 ]
 
-{ #category : #accessing }
-Spaceship >> currentFuel [
-
-	^ currentFuel
-]
-
-{ #category : #'as yet unclassified' }
+{ #category : #setting }
 Spaceship >> discardRandomCard [
 
 	cards removeAt: cards size atRandom

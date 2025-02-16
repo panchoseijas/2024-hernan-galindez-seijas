@@ -11,43 +11,6 @@ Class {
 }
 
 { #category : #operations }
-Redo class >> createWith: playersCollection [
-
-	^ instance ifNil: [ instance := self new initialize ]
-]
-
-{ #category : #'as yet unclassified' }
-Redo class >> deleteInstance [
-	instance := nil
-]
-
-{ #category : #operations }
-Redo class >> recreate [
-	instance :=  self new initialize.
-	^ instance
-]
-
-{ #category : #operations }
-Redo >> applyFrom: aSpaceship target: target in: blockOfCode [
-
-	lastUsedCard 
-		applyFrom: aSpaceship
-		target: target
-		in: blockOfCode
-]
-
-{ #category : #initialization }
-Redo >> copy [
-
-	^ self
-]
-
-{ #category : #initialization }
-Redo >> initialize [
-	lastUsedCard := NullCard new.
-]
-
-{ #category : #operations }
 Redo >> lastUsedCard: aCard [
 
 	^ aCard
@@ -57,12 +20,6 @@ Redo >> lastUsedCard: aCard [
 Redo >> use: aCardManager from: cardThrower target: aTarget [
 
 	aCardManager redoLastCardFrom: cardThrower target: aTarget
-]
-
-{ #category : #operations }
-Redo >> verifyCanBePlayed: isShipTurn [
-
-	^ self
 ]
 
 { #category : #operations }

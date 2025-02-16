@@ -21,7 +21,7 @@ Card >> use: aCardManager from: cardThrower target: aTarget [
 ]
 
 { #category : #operations }
-Card >> verifyCanBePlayed: isShipTurn [
+Card >> verifyCanBePlayedBy: aSpaceship with: aTurnManager [
 
-	self subclassResponsibility
+	self subclassResponsibility.
 ]

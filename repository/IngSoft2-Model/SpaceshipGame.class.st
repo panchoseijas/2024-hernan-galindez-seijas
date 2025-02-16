@@ -51,7 +51,7 @@ SpaceshipGame >> deckOf: aSpaceshipName [
 { #category : #initialization }
 SpaceshipGame >> initializeWithPlayers: aCollectionOfPlayers withGameboardLength: aLength withDice: aDiceCollection withLaps: anAmountOfLaps withParsecs: aNumberOfParsecs [
 
-	| squareGenerator cardCollection |
+	| squareGenerator |
 	dice := Dice with: aDiceCollection.
 
 	squareGenerator := DefaultSquareGenerator distributions: {
@@ -80,7 +80,6 @@ SpaceshipGame >> initializeWithPlayers: aCollectionOfPlayers withGameboardLength
 		                 Overload new.
 		                 Redo new }.
 
-	redoCardInstance := Redo recreate.
 
 	players := aCollectionOfPlayers collect: [ :playerName |
 		           Spaceship
@@ -91,8 +90,6 @@ SpaceshipGame >> initializeWithPlayers: aCollectionOfPlayers withGameboardLength
 		player
 			giveCard: possibleCards atRandom;
 			giveCard: possibleCards atRandom ].
-
-	Redo deleteInstance.
 
 	turnManager := TurnManager initializeWithPlayers: players.
 	gameboard := Gameboard
@@ -117,7 +114,7 @@ SpaceshipGame >> initializeWithPlayers: aCollectionOfPlayers withGameboardLength
 		           Spaceship
 			           withName: playerName
 			           withFuel: dice maxThrow * 2 ].
-	redoCardInstance := Redo recreate.
+
 	possibleCards := cardCollection deepCopy.
 
 	turnManager := TurnManager initializeWithPlayers: players.
@@ -127,7 +124,7 @@ SpaceshipGame >> initializeWithPlayers: aCollectionOfPlayers withGameboardLength
 			giveCard: possibleCards first deepCopy;
 			giveCard: possibleCards second deepCopy ].
 
-	Redo deleteInstance.
+
 	gameboard := Gameboard
 		             numberOfSquares: aLength
 		             spaceships: players
