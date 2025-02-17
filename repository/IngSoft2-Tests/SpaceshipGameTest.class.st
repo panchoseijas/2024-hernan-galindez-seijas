@@ -1287,7 +1287,7 @@ SpaceshipGameTest >> testWhenFirstPlayerLandsOnHyperJumpThenItStaysInTheSamePosi
 { #category : #tests }
 SpaceshipGameTest >> testWhenGameFinishesGivesTheRankingOfTheSpaceships [
 
-	| aSpaceship aDiceCollection aGame aSpaceshipCollection aSpaceship2 aSpaceship3 specificGenerator |
+	| aSpaceship aDiceCollection aGame aSpaceshipCollection aSpaceship2 aSpaceship3 specificGenerator reversal |
 	aSpaceship := 'Pancho'.
 	aSpaceship2 := 'Zepo'.
 	aSpaceship3 := 'Zalo'.
@@ -1295,9 +1295,9 @@ SpaceshipGameTest >> testWhenGameFinishesGivesTheRankingOfTheSpaceships [
 		                        with: aSpaceship
 		                        with: aSpaceship2
 		                        with: aSpaceship3.
-	aDiceCollection := { (LoadedDie sequence: #( 15 10 7 10 16 7 5 50 )) }.
+	aDiceCollection := { (LoadedDie sequence: #( 15 12 10 10 16 7 5 50 )) }.
 	specificGenerator := SpecificSquareGenerator with:
-		                     { (NormalSquare create -> 1) }.
+		                     { (NormalSquare create -> 13) }.
 	aGame := SpaceshipGame
 		         withPlayers: aSpaceshipCollection
 		         withGameboardLength: 15
@@ -1307,11 +1307,12 @@ SpaceshipGameTest >> testWhenGameFinishesGivesTheRankingOfTheSpaceships [
 		         squareGenerator: specificGenerator
 		         rewards: {  }
 		         cards: {
-				         Overload.
-				         Ally.
-				         Acceleration }.
+				         Reversal new.
+				         Ally new.
+				         Acceleration new }.
 
-
+	reversal := (aGame deckOf: aSpaceship) first.
+	aGame playCard: reversal from: aSpaceship target: 13.
 	aGame playTurn.
 	aGame playTurn.
 	aGame playTurn.
