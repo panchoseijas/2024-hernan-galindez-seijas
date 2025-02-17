@@ -11,8 +11,8 @@ Class {
 Wormhole class >> newPair [
 
 	| aWormhole anotherWormhole wormholePair |
-	aWormhole := self new.
-	anotherWormhole := self new.
+	aWormhole := FirstWormhole new.
+	anotherWormhole := SecondWormhole new.
 	aWormhole connectTo: anotherWormhole.
 	anotherWormhole connectTo: aWormhole.
 
@@ -26,8 +26,8 @@ Wormhole class >> newPair [
 Wormhole class >> newPairIn: aBoard at: firstPosition and: secondPosition [
 
 	| aWormhole anotherWormhole wormholePair |
-	aWormhole := self new.
-	anotherWormhole := self new.
+	aWormhole := FirstWormhole new.
+	anotherWormhole := SecondWormhole new.
 	aWormhole connectTo: anotherWormhole.
 	anotherWormhole connectTo: aWormhole.
 
@@ -39,7 +39,13 @@ Wormhole class >> newPairIn: aBoard at: firstPosition and: secondPosition [
 ]
 
 { #category : #'add/remove' }
-Wormhole >> applyEffectTo: aSpaceship in: aGameboard [
+Wormhole >> applyInvertedEffectTo: aSpaceship in: aGameboard [
+
+	self subclassResponsibility
+]
+
+{ #category : #'add/remove' }
+Wormhole >> applyNormalEffectTo: aSpaceship in: aGameboard [
 
 	occupiedBy remove: aSpaceship.
 	connection keep: aSpaceship
@@ -49,4 +55,17 @@ Wormhole >> applyEffectTo: aSpaceship in: aGameboard [
 Wormhole >> connectTo: anotherWormhole [
 
 	connection := anotherWormhole
+]
+
+{ #category : #'add/remove' }
+Wormhole >> invert [
+
+	state := state invert.
+	connection onlyInvertSelf
+]
+
+{ #category : #'add/remove' }
+Wormhole >> onlyInvertSelf [
+
+	state := state invert
 ]

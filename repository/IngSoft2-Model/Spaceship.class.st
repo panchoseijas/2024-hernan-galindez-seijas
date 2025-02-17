@@ -6,10 +6,10 @@ Class {
 		'maxCapacity',
 		'currentFuel',
 		'needsToThrow',
-		'lostTurns',
-		'deck',
 		'ally',
-		'diceAdjustment'
+		'diceAdjustment',
+		'cards',
+		'fuelHistory'
 	],
 	#category : #'IngSoft2-Model'
 }
@@ -27,23 +27,15 @@ Spaceship >> allyWith: aSpaceship [
 ]
 
 { #category : #setting }
-Spaceship >> applyCard: card [
-
-	deck appliedCard: card.
-]
-
-{ #category : #setting }
-Spaceship >> applyPenaltyIn: gameboard [
-
-	gameboard moveToStart: self.
+Spaceship >> applyPenaltyIn: aGameboard [ 
+	aGameboard spaceshipRanOutOfFuel: self.
 	currentFuel := maxCapacity.
-	lostTurns := 2
 ]
 
-{ #category : #testing }
-Spaceship >> canPlay [
+{ #category : #accessing }
+Spaceship >> cards [
 
-	^ lostTurns = 0
+	^ cards
 ]
 
 { #category : #setting }
@@ -66,9 +58,15 @@ Spaceship >> changeTotalThrowBy: aNumber [
 ]
 
 { #category : #setting }
+Spaceship >> discardRandomCard [
+
+	cards removeAt: cards size atRandom
+]
+
+{ #category : #setting }
 Spaceship >> giveCard: aCard [
 
-	deck addCard: aCard copy
+	cards add: aCard deepCopy
 ]
 
 { #category : #initialization }
@@ -78,16 +76,10 @@ Spaceship >> initializeWithName: aName withFuel: fuelCapacity [
 	currentFuel := fuelCapacity.
 	maxCapacity := fuelCapacity.
 	needsToThrow := 0.
-	lostTurns := 0.
 	diceAdjustment := 0.
 	ally := NullSpaceship new.
-	deck := Deck with: #(  ) asOrderedCollection
-]
-
-{ #category : #'game logic' }
-Spaceship >> lostATurn [
-	lostTurns := lostTurns - 1.
-
+	cards := OrderedCollection new.
+	fuelHistory := OrderedCollection new.
 ]
 
 { #category : #accessing }
@@ -106,8 +98,9 @@ Spaceship >> move: anAmountOfSquares in: aGameboard [
 ]
 
 { #category : #accessing }
-Spaceship >> name [ 
-	^name
+Spaceship >> name [
+
+	^ name
 ]
 
 { #category : #initialization }
@@ -119,9 +112,20 @@ Spaceship >> needsToThrow: expectedNumber [
 { #category : #accessing }
 Spaceship >> playWith: anAmountOfSquares in: aGameboard [
 
+	self recordFuel.
 	anAmountOfSquares abs < needsToThrow ifTrue: [ ^ self ].
 	needsToThrow := 0.
 	self move: anAmountOfSquares in: aGameboard
+]
+
+{ #category : #initialization }
+Spaceship >> recordFuel [
+
+	fuelHistory add: currentFuel.
+
+	fuelHistory size < 3 ifTrue: [ ^ self ].
+
+	fuelHistory removeFirst
 ]
 
 { #category : #setting }
@@ -130,9 +134,19 @@ Spaceship >> refuel [
 	currentFuel := maxCapacity
 ]
 
+{ #category : #initialization }
+Spaceship >> restoreAllyFuel [
+
+	ally restoreFuel.
+]
+
 { #category : #setting }
-Spaceship >> removeEffect: cardToBeRemoved [
-	^ (deck removeCardEffect: cardToBeRemoved ) 
+Spaceship >> restoreFuel [
+
+	fuelHistory size < 2 ifTrue: [
+		Error signal:
+			name, ' has not played two turns' ].
+	currentFuel := fuelHistory first
 ]
 
 { #category : #accessing }
@@ -161,6 +175,9 @@ Spaceship >> useAllyFuelIfNecessary: squaresToMove in: gameboard [
 
 { #category : #accessing }
 Spaceship >> useCard: aCard [
-	^ deck removeCard: aCard
-	
+
+	cards
+		remove: aCard
+		ifAbsent: [
+		Error signal: self name , ' does not have a ' , aCard class name, ' card' ]
 ]

@@ -5,7 +5,7 @@ Class {
 }
 
 { #category : #accessing }
-Instant >> verifyCanBePlayed: isShipTurn [
+Instant >> verifyCanBePlayedBy: aSpaceship with: aTurnManager [
 
 	^ true
 ]

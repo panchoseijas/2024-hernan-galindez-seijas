@@ -9,10 +9,26 @@ Class {
 		'measurement',
 		'measurmentPerSquare',
 		'lastSquareLandedOn',
-		'cards'
+		'cards',
+		'turnManager'
 	],
 	#category : #'IngSoft2-Model'
 }
+
+{ #category : #accessing }
+Gameboard class >> numberOfSquares: aNumberOfSquares spaceships: aSpaceshipCollection turnManager: aTurnManager withParsecs: aNumberOfParsecs using: aDiceCollection generator: squareGenerator cards: cardCollection [
+
+	self verifyGreaterThanZero: aNumberOfSquares.
+
+	^ self new
+		  initializeWithNumberOfSquares: aNumberOfSquares
+		  withSpaceships: aSpaceshipCollection
+		  withTurnManager: aTurnManager
+		  withParsecs: aNumberOfParsecs
+		  withDice: aDiceCollection
+		  withGenerator: squareGenerator
+		  withCards: cardCollection
+]
 
 { #category : #accessing }
 Gameboard class >> numberOfSquares: aNumberOfSquares spaceships: aSpaceshipCollection withParsecs: aNumberOfParsecs using: aDiceCollection generator: squareGenerator cards: cardCollection [
@@ -35,6 +51,12 @@ Gameboard class >> verifyGreaterThanZero: aLength [
 		Error signal: 'Length must be greater than zero' ]
 ]
 
+{ #category : #'game logic' }
+Gameboard >> addLapTo: aSpaceship [
+
+	lapCounter at: aSpaceship update: [ :x | x + 1 ]
+]
+
 { #category : #accessing }
 Gameboard >> applyEffectTo: aSpaceship [
 
@@ -48,7 +70,7 @@ Gameboard >> applyEffectTo: aSpaceship [
 { #category : #accessing }
 Gameboard >> applyLastEffectTo: aSpaceship [
 
-	lastSquareLandedOn applyEffectTo: aSpaceship in: self
+	lastSquareLandedOn applyNormalEffectTo: aSpaceship in: self
 ]
 
 { #category : #accessing }
@@ -60,8 +82,7 @@ Gameboard >> find: aTarget [
 ]
 
 { #category : #initialization }
-Gameboard >> initializeWithNumberOfSquares: aNumberOfSquares withSpaceships: spaceshipsCollection withParsecs: aNumberOfParsecs withDice: aDiceCollection withGenerator: squareGenerator withCards: cardCollection [
-
+Gameboard >> initializeWithNumberOfSquares: aNumberOfSquares withSpaceships: spaceshipsCollection withTurnManager: aTurnManager withParsecs: aNumberOfParsecs withDice: aDiceCollection withGenerator: squareGenerator withCards: cardCollection [
 
 	spaceships := spaceshipsCollection.
 	lapCounter := Dictionary
@@ -75,7 +96,13 @@ Gameboard >> initializeWithNumberOfSquares: aNumberOfSquares withSpaceships: spa
 	cards := cardCollection.
 	board := squareGenerator generateSquares: aNumberOfSquares.
 	lastSquareLandedOn := NormalSquare create.
+	turnManager := aTurnManager.
 	self setPlayersAtFirstPosition: spaceships
+]
+
+{ #category : #'game logic' }
+Gameboard >> invertSquareOn: anIndex [ 
+	(board at: anIndex) invert
 ]
 
 { #category : #accessing }
@@ -109,14 +136,14 @@ Gameboard >> move: aSpaceship with: aNumberOfSquares [
 ]
 
 { #category : #setting }
-Gameboard >> moveAllBack: anAmountOfSquares except: aSpaceship [
+Gameboard >> moveAll: anAmountOfSquares except: aSpaceship [
 
 	| playersToMove |
 	playersToMove := spaceships select: [ :spaceship |
 		                 spaceship ~= aSpaceship ].
 
 	playersToMove do: [ :player |
-		player move: anAmountOfSquares negated in: self ]
+		player move: anAmountOfSquares  in: self ]
 ]
 
 { #category : #setting }
@@ -153,4 +180,20 @@ Gameboard >> setPlayersAtFirstPosition: players [
 Gameboard >> size [
 
 	^ board size
+]
+
+{ #category : #'game logic' }
+Gameboard >> spaceshipRanOutOfFuel: aSpaceship [
+
+	turnManager applyPenalty: 2 to: aSpaceship.
+	self moveToStart: aSpaceship
+]
+
+{ #category : #'game logic' }
+Gameboard >> substractLapTo: aSpaceship [
+
+	(lapCounter at: aSpaceship) = 0 ifTrue: [
+		self moveToStart: aSpaceship.
+		^ self ].
+	lapCounter at: aSpaceship update: [ :x | x - 1 ]
 ]

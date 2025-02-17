@@ -4,11 +4,10 @@ Class {
 	#category : #'IngSoft2-Model'
 }
 
-{ #category : #accessing }
-Repeat >> applyFrom: aSpaceship target: otherSpaceshipName blockToApplyLastEffect: blockToApplyLastEffect [
+{ #category : #operations }
+Repeat >> use: aCardManager from: cardThrower target: aTarget [
 
-	| target |
-	target := players detect: [ :player |
-		          player name = otherSpaceshipName ].
-	blockToApplyLastEffect value: target
+	| spaceship |
+	spaceship := aCardManager shipNamed: aTarget.
+	aCardManager applyLastEffectTo: spaceship
 ]
